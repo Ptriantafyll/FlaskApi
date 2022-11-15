@@ -1,3 +1,4 @@
 Flask
 Flask-restful
 PyMongo
+python-dotenv
