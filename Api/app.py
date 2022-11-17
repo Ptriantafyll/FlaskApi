@@ -18,9 +18,15 @@ client = MongoClient("mongodb+srv://PanosTriantafyllopoulos:" + os.getenv("MONGO
 
 class HelloWorld(Resource):
     def get(self):
-        return {'hello': 'world'}
+        return {"hello": "world"}
+
+class KeepUser(Resource):
+    def get(self):
+        return {"new": "user"}
+
 
 api.add_resource(HelloWorld, '/')
+api.add_resource(KeepUser, "/newuser")
 
 if __name__ == '__main__':
     app.run(debug=True)
