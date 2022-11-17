@@ -11,7 +11,7 @@ api = Api(app)
 
 class HelloWorld(Resource):
     def get(self):
-        return {"hello": "world"}
+        return {"message": "Hello world"}
 
 class KeepUser(Resource):
     def get(self):
