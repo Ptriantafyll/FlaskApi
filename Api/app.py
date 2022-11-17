@@ -1,6 +1,6 @@
 import os
-from flask import Flask
-from flask_restful import Resource, Api
+from flask import Flask, request
+from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
@@ -9,13 +9,6 @@ load_dotenv() # load .env file
 app = Flask(__name__)
 api = Api(app)
 
-client = MongoClient("mongodb+srv://PanosTriantafyllopoulos:" + os.getenv("MONGODB_ATLAS_PW") + "@poidb.gojkx.mongodb.net/?retryWrites=true&w=majority")
-# db = client.test # test is the name of the db
-# users = db['users']
-# cursor = users.find({})
-# for user in cursor:
-    # print(user["username"])
-
 class HelloWorld(Resource):
     def get(self):
         return {"hello": "world"}
@@ -23,6 +16,13 @@ class HelloWorld(Resource):
 class KeepUser(Resource):
     def get(self):
         return {"new": "user"}
+    def post(self):
+        args = parser.parse_args()
+        print(request.json)
+        return {"post" : "request"}
+
+parser = reqparse.RequestParser()
+parser.add_argument("data", type=int, help="my test data")
 
 
 api.add_resource(HelloWorld, '/')
