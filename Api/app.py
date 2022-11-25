@@ -22,9 +22,9 @@ class KeepUser(Resource):
         return {"post" : "request"}
 
 parser = reqparse.RequestParser()
-parser.add_argument("data", type=int, help="my test data")
+parser.add_argument("data", type=int, help="my test data") # parses 'data' argument (needs to be int)
 
-
+# adding resources
 api.add_resource(HelloWorld, '/')
 api.add_resource(KeepUser, "/newuser")
 
