@@ -1,0 +1,54 @@
+<mxfile host="65bd71144e">
+    <diagram id="aif7UOtikH1cvzIwgrPL" name="Page-1">
+        <mxGraphModel dx="564" dy="332" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="74" value="User" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fontColor=#000000;labelBorderColor=none;strokeColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="219" y="62" width="192" height="194" as="geometry"/>
+                </mxCell>
+                <mxCell id="75" value="id : 0" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#000000;labelBorderColor=none;" parent="74" vertex="1">
+                    <mxGeometry y="26" width="192" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="76" value="url : { &#10;    &quot;url_text&quot; : &quot;www.youtube.com&quot;,&#10;    &quot;rating&quot; : 5&#10;}&#10;    &#10;" style="text;strokeColor=#000000;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#000000;labelBorderColor=none;" parent="74" vertex="1">
+                    <mxGeometry y="52" width="192" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="77" value="url : { &#10;    &quot;url_text&quot; : &quot;www.wikipedia.com&quot;,&#10;    &quot;rating&quot; : 4&#10;}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#000000;labelBorderColor=none;" parent="74" vertex="1">
+                    <mxGeometry y="122" width="192" height="72" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="WN1ep7Yoq9cvyFqxQtct" name="Page-2">
+        <mxGraphModel dx="564" dy="330" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="o8-L9z-fB8S9kuwNl1yu-0"/>
+                <mxCell id="o8-L9z-fB8S9kuwNl1yu-1" parent="o8-L9z-fB8S9kuwNl1yu-0"/>
+                <mxCell id="de5LJ1GYRyWrotm7rgIp-0" value="Rating" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fontColor=#000000;labelBorderColor=none;strokeColor=#000000;" parent="o8-L9z-fB8S9kuwNl1yu-1" vertex="1">
+                    <mxGeometry x="133" y="66" width="192" height="111" as="geometry"/>
+                </mxCell>
+                <mxCell id="de5LJ1GYRyWrotm7rgIp-1" value="userid : 0" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#000000;labelBorderColor=none;" parent="de5LJ1GYRyWrotm7rgIp-0" vertex="1">
+                    <mxGeometry y="26" width="192" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="de5LJ1GYRyWrotm7rgIp-2" value="url : &quot;www.youtube.com&quot;    &#10;" style="text;strokeColor=#000000;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#000000;labelBorderColor=none;" parent="de5LJ1GYRyWrotm7rgIp-0" vertex="1">
+                    <mxGeometry y="52" width="192" height="29" as="geometry"/>
+                </mxCell>
+                <mxCell id="de5LJ1GYRyWrotm7rgIp-3" value="rating: 5" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#000000;labelBorderColor=none;" parent="de5LJ1GYRyWrotm7rgIp-0" vertex="1">
+                    <mxGeometry y="81" width="192" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="de5LJ1GYRyWrotm7rgIp-5" value="Rating" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fontColor=#000000;labelBorderColor=none;strokeColor=#000000;" parent="o8-L9z-fB8S9kuwNl1yu-1" vertex="1">
+                    <mxGeometry x="365" y="64" width="192" height="111" as="geometry"/>
+                </mxCell>
+                <mxCell id="de5LJ1GYRyWrotm7rgIp-6" value="userid : 0" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#000000;labelBorderColor=none;" parent="de5LJ1GYRyWrotm7rgIp-5" vertex="1">
+                    <mxGeometry y="26" width="192" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="de5LJ1GYRyWrotm7rgIp-7" value="url : &quot;www.wikipedia.com&quot;    &#10;" style="text;strokeColor=#000000;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#000000;labelBorderColor=none;" parent="de5LJ1GYRyWrotm7rgIp-5" vertex="1">
+                    <mxGeometry y="52" width="192" height="29" as="geometry"/>
+                </mxCell>
+                <mxCell id="de5LJ1GYRyWrotm7rgIp-8" value="rating: 4" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#000000;labelBorderColor=none;" parent="de5LJ1GYRyWrotm7rgIp-5" vertex="1">
+                    <mxGeometry y="81" width="192" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
