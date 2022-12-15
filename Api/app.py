@@ -1,10 +1,6 @@
-import os
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
-from pymongo import MongoClient
-from dotenv import load_dotenv
 
-load_dotenv() # load .env file
 
 app = Flask(__name__)
 api = Api(app)
