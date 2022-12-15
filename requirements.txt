@@ -4,3 +4,8 @@ PyMongo
 python-dotenv
 beautifulsoup4
 requests
+jupyter
+pymongoarrow
+pymongo[srv]
+pandas
+numpy
