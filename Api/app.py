@@ -14,15 +14,17 @@ class HelloWorld(Resource):
         return {"message": "Hello world"}
 
 class KeepUser(Resource):
+    # todo: make post request to /newuser create a user in the database
     def get(self):
         return {"new": "user"}
     def post(self):
-        args = parser.parse_args()
-        print(request.json)
+        # args = parser.parse_args()
+        # print(request.json)
+        # todo: here we should create the user
         return {"post" : "request"}
 
-parser = reqparse.RequestParser()
-parser.add_argument("data", type=int, help="my test data") # parses 'data' argument (needs to be int)
+# parser = reqparse.RequestParser()
+# parser.add_argument("data", type=int, help="my test data") # parses 'data' argument (needs to be int)
 
 # adding resources
 api.add_resource(HelloWorld, '/')
