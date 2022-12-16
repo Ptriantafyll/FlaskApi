@@ -18,6 +18,8 @@ class HelloWorld(Resource):
 
 # adding resources
 api.add_resource(HelloWorld, '/')
+api.add_resource(user_routes.CreateUser, '/user/newuser')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
