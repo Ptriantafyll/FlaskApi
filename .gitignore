@@ -1,3 +1,3 @@
 .env
 pseudocode.txt
-Api/models/__pycache__/
+*__pycache__*
