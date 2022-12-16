@@ -1,7 +1,7 @@
 def validator():
     # todo: create regex for links
     return {
-        "$jsonSchema":{
+        "$jsonSchema": {
             "bsonType": "object",
             "properties": {
                 "links": {
@@ -14,7 +14,7 @@ def validator():
                                 "bsonType": "string"
                             },
                             "rating": {
-                                "enum": [1,2,3,4,5]
+                                "enum": [1, 2, 3, 4, 5]
                             }
                         }
                     },
