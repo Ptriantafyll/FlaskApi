@@ -4,6 +4,9 @@ def validator():
         "$jsonSchema": {
             "bsonType": "object",
             "properties": {
+                "_id": {
+                    "bsonType": "objectId"
+                },
                 "links": {
                     "bsonType": "array",
                     "items": {
