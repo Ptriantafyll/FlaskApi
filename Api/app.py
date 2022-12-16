@@ -1,22 +1,19 @@
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
+import mongoDB_connection
 
 from resources import user as user_resources
 
 app = Flask(__name__)
 api = Api(app)
 
-class HelloWorld(Resource):
-    def get(self):
-        return {"message": "Hello world"}
-
+mongoDB_connection.connect_to_mongodb()
 
 # parser = reqparse.RequestParser()
 # parser.add_argument("data", type=int, help="my test data") # parses 'data' argument (needs to be int)
 # args = parser.parse_args()
 
 # adding resources to endpoints
-api.add_resource(HelloWorld, '/')
 api.add_resource(user_resources.CreateUser, '/user/newuser')
 
 
