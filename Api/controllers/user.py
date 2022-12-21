@@ -13,6 +13,7 @@ def create_user():
     except Exception as e:
         print(e)
 
+    # ? create a new user (empty for now as _id is generated automatically) and add to db
     newuser = {}
     db.get_collection("user").insert_one(newuser)
 
