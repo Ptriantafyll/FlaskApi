@@ -13,7 +13,7 @@ mongoDB_connection.connect_to_mongodb()
 # parser.add_argument("data", type=int, help="my test data") # parses 'data' argument (needs to be int)
 # args = parser.parse_args()
 
-# adding resources to endpoints
+# ? adding resources to endpoints
 api.add_resource(user_resources.CreateUser, '/user/newuser')
 
 
