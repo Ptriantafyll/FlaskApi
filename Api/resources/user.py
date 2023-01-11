@@ -6,4 +6,4 @@ class CreateUser(Resource):
     def post(self):
         message = user_controller.create_user()
         # todo: return meaningful message
-        return {"message": message}
+        return {"message": "User created successfully"}
