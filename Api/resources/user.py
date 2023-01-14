@@ -7,3 +7,8 @@ class CreateUser(Resource):
         message = user_controller.create_user()
         # todo: return meaningful message
         return {"message": message}
+
+class NewRating(Resource):
+    # todo: handle put request
+    def put(self):
+        return {"message": "in put request"}
