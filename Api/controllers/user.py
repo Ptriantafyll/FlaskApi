@@ -43,8 +43,9 @@ def user_adds_rating(userToUpdate, linkToUpdate):
             # ? link does not exist
             new_link = {"url": linkToUpdate["url"],
                         "rating": linkToUpdate["rating"]}
+            print(new_link)
             filters = {"_id": userId}
-            updates = {{"$push": {"links": new_link}}}
+            updates = {"$push": {"links": new_link}}
     else:
         # ? user has no links
         filters = {"_id": userId}
