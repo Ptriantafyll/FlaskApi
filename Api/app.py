@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Api
 import mongoDB_connection
 
 from resources import user as user_resources
