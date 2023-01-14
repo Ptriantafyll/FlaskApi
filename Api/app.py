@@ -1,5 +1,5 @@
-from flask import Flask, request
-from flask_restful import Resource, Api, reqparse
+from flask import Flask
+from flask_restful import Api
 import mongoDB_connection
 
 from resources import user as user_resources
@@ -14,7 +14,8 @@ mongoDB_connection.connect_to_mongodb()
 # args = parser.parse_args()
 
 # ? adding resources to endpoints
-api.add_resource(user_resources.CreateUser, '/user/newuser')
+api.add_resource(user_resources.CreateUser, "/user/newuser")
+api.add_resource(user_resources.NewRating, "/user/newrating")
 
 
 if __name__ == '__main__':
