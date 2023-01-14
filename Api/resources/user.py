@@ -1,4 +1,5 @@
 from controllers import user as user_controller
+from flask import request
 from flask_restful import Resource
 
 
@@ -9,6 +10,11 @@ class CreateUser(Resource):
         return {"message": message}, 201
 
 class NewRating(Resource):
-    # todo: handle put request
     def put(self):
-        return {"message": "in put request"}
+        data = request.json
+        userToUpdate = data["user"]
+        linkToUpdate = data["link"]
+        message = user_controller.user_adds_rating(userToUpdate, linkToUpdate)
+
+        # todo: return meaningful message
+        return {"message": message}
