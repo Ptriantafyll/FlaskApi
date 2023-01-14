@@ -29,8 +29,26 @@ def user_adds_rating(userToUpdate, linkToUpdate):
     from bson.objectid import ObjectId
     userId = ObjectId(userToUpdate)
 
-    filters = {"_id": userId, "links.url": linkToUpdate["url"]}
-    updates = {"$set": {"links.$.rating": linkToUpdate["rating"]}}
+    current_user = db.get_collection("user").find_one({"_id": userId})
+    if "links" in current_user:
+        # ? user has links
+        links = current_user.get("links")
+        urls = [link['url'] for link in links]
+
+        if linkToUpdate["url"] in urls:
+            # ? link exists
+            filters = {"_id": userId, "links.url": linkToUpdate["url"]}
+            updates = {"$set": {"links.$.rating": linkToUpdate["rating"]}}
+        else:
+            # ? link does not exist
+            new_link = {"url": linkToUpdate["url"],
+                        "rating": linkToUpdate["rating"]}
+            filters = {"_id": userId}
+            updates = {{"$push": {"links": new_link}}}
+    else:
+        # ? user has no links
+        filters = {"_id": userId}
+        updates = {"$set": {"links": [linkToUpdate]}}
 
     db.get_collection("user").update_one(filters, updates)
 
