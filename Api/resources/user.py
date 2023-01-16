@@ -7,7 +7,7 @@ class CreateUser(Resource):
     def post(self):
         newUserId = user_controller.create_user()
         # todo: return meaningful message
-        return {"message": newUserId}, 201
+        return {"userid": newUserId}, 201
 
 
 class NewRating(Resource):
