@@ -5,9 +5,10 @@ from flask_restful import Resource
 
 class CreateUser(Resource):
     def post(self):
-        message = user_controller.create_user()
+        newUserId = user_controller.create_user()
         # todo: return meaningful message
-        return {"message": message}, 201
+        return {"message": newUserId}, 201
+
 
 class NewRating(Resource):
     def put(self):
