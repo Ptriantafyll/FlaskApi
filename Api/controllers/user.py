@@ -15,10 +15,10 @@ def create_user():
         print(e)  # todo: probably will get rid of this print
 
     # ? create a new user (empty for now as _id is generated automatically) and add to db
-    newuser = {}
-    db.get_collection("user").insert_one(newuser)
+    newUser = db.get_collection("user").insert_one({})
+    newUserId = str(newUser.inserted_id)
 
-    return "User added successfully"
+    return newUserId
 
 
 def user_adds_rating(userToUpdate, linkToUpdate):
