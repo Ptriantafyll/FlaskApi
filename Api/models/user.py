@@ -1,5 +1,4 @@
 def validator():
-    # todo: create regex for links
     return {
         "$jsonSchema": {
             "bsonType": "object",
@@ -14,7 +13,8 @@ def validator():
                         "required": ["url", "rating"],
                         "properties": {
                             "url": {
-                                "bsonType": "string"
+                                "bsonType": "string",
+                                "pattern": "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
                             },
                             "rating": {
                                 "enum": [1, 2, 3, 4, 5]
