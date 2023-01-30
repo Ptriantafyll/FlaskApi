@@ -55,3 +55,14 @@ def user_adds_rating(userToUpdate, linkToUpdate):
 
     # todo: return meaningful message
     return "User updated successfully"
+
+
+def get_rating_for_user(str_userId, links_to_rate):
+    db = mongoDB_connection.db
+    user_validator = user.validator()
+    db.command("collMod", "user", validator=user_validator)
+
+    userId = ObjectId(str_userId)
+    current_user = db.get_collection("user").find_one({"_id": userId})
+    # todo: for now generate random number for each link in links_to_rate
+    # todo: later make the rating based on the model of the user
