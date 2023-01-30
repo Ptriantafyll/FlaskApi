@@ -1,7 +1,8 @@
 from controllers import user as user_controller
 from flask import request
 from flask_restful import Resource
-
+import requests
+from bs4 import BeautifulSoup
 
 class CreateUser(Resource):
     def post(self):
@@ -22,10 +23,17 @@ class NewRating(Resource):
 
 
 class GetRatings(Resource):
-    def post(self):
+    def post(self, userId):
         data = request.json
-        userId = data["user"]
-        links_of_current_page = data["links"]
+        url = data["url"]
+
+        r = requests.get(url)
+        soup = BeautifulSoup(r.text, "html.parser")
+        links_of_current_page = []
+        for link in soup.find_all("a"):
+            href = link.get("href")
+            if href and href.startswith("http"):
+                links_of_current_page.append(href)
 
         ratings = user_controller.get_ratings_for_user(
             userId, links_of_current_page)
