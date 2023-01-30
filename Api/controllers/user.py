@@ -57,7 +57,7 @@ def user_adds_rating(userToUpdate, linkToUpdate):
     return "User updated successfully"
 
 
-def get_rating_for_user(str_userId, links_to_rate):
+def get_ratings_for_user(str_userId, links_to_rate):
     db = mongoDB_connection.db
     user_validator = user.validator()
     db.command("collMod", "user", validator=user_validator)
