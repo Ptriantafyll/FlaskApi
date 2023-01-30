@@ -16,7 +16,7 @@ mongoDB_connection.connect_to_mongodb()
 # ? adding resources to endpoints
 api.add_resource(user_resources.CreateUser, "/user/newuser")
 api.add_resource(user_resources.NewRating, "/user/newrating")
-api.add_resource(user_resources.GetRatings, "/user/ratings")
+api.add_resource(user_resources.GetRatings, "/user/ratings/<string:userId>")
 
 
 if __name__ == '__main__':
