@@ -30,4 +30,4 @@ class GetRatings(Resource):
         ratings = user_controller.get_ratings_for_user(
             userId, links_of_current_page)
 
-        return {"ratings": ratings}
+        return {"user": userId, "ratings": ratings}
