@@ -19,3 +19,15 @@ class NewRating(Resource):
 
         # todo: return meaningful message
         return {"message": message}
+
+
+class GetRatings(Resource):
+    def post(self):
+        data = request.json
+        userId = data["user"]
+        links_of_current_page = data["links"]
+
+        ratings = user_controller.get_ratings_for_user(
+            userId, links_of_current_page)
+
+        return {"ratings": ratings}
