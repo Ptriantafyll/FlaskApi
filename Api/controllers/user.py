@@ -26,7 +26,6 @@ def user_adds_rating(userToUpdate, linkToUpdate):
     user_validator = user.validator()
     db.command("collMod", "user", validator=user_validator)
 
-    from bson.objectid import ObjectId
     userId = ObjectId(userToUpdate)
 
     current_user = db.get_collection("user").find_one({"_id": userId})
