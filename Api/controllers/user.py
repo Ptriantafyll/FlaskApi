@@ -1,6 +1,7 @@
 from bson.objectid import ObjectId
 from models import user
 import mongoDB_connection
+import random
 
 
 def create_user():
@@ -63,5 +64,12 @@ def get_ratings_for_user(str_userId, links_to_rate):
 
     userId = ObjectId(str_userId)
     current_user = db.get_collection("user").find_one({"_id": userId})
+
+    ratings = {}
+    for url in links_to_rate:
+        ratings[url] = random.randint(1, 5)
+
     # todo: for now generate random number for each link in links_to_rate
     # todo: later make the rating based on the model of the user
+
+    return ratings

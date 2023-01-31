@@ -1,11 +1,13 @@
 from flask import Flask
 from flask_restful import Api
 import mongoDB_connection
+from flask_cors import CORS
 
 from resources import user as user_resources
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 
 mongoDB_connection.connect_to_mongodb()
 
@@ -16,6 +18,7 @@ mongoDB_connection.connect_to_mongodb()
 # ? adding resources to endpoints
 api.add_resource(user_resources.CreateUser, "/user/newuser")
 api.add_resource(user_resources.NewRating, "/user/newrating")
+api.add_resource(user_resources.GetRatings, "/user/ratings/<string:userId>")
 
 
 if __name__ == '__main__':
