@@ -1,11 +1,13 @@
 from flask import Flask
 from flask_restful import Api
 import mongoDB_connection
+from flask_cors import CORS
 
 from resources import user as user_resources
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 
 mongoDB_connection.connect_to_mongodb()
 
