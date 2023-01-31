@@ -3,6 +3,7 @@ from flask import request
 from flask_restful import Resource
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 class CreateUser(Resource):
     def post(self):
@@ -19,7 +20,7 @@ class NewRating(Resource):
         message = user_controller.user_adds_rating(userToUpdate, linkToUpdate)
 
         # todo: return meaningful message
-        return {"message": message}
+        return {"message": message}, 204
 
 
 class GetRatings(Resource):
@@ -29,13 +30,9 @@ class GetRatings(Resource):
 
         r = requests.get(url)
         soup = BeautifulSoup(r.text, "html.parser")
-        links_of_current_page = []
-        for link in soup.find_all("a"):
-            href = link.get("href")
-            if href and href.startswith("http"):
-                links_of_current_page.append(href)
+        links_of_current_page = [urljoin(url, link.get('href')) for link in soup.find_all('a')]
 
         ratings = user_controller.get_ratings_for_user(
             userId, links_of_current_page)
 
-        return {"user": userId, "ratings": ratings}
+        return {"user": userId, "ratings": ratings}, 200
