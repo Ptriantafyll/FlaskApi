@@ -32,3 +32,7 @@ Run the following command in a terminal and then navigate to localhost:5000 on a
 ```bash
 python ./Api/app.py
 ```
+
+## Usage
+
+As of now the api accepts a post request to create a new user, a put request to update the user's ratings of websites and a post request to get the current website and calculate the ratings for the urls in it (for now the rating is random)
