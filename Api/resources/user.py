@@ -1,7 +1,6 @@
 from controllers import user as user_controller
 from flask import request
 from flask_restful import Resource
-from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -41,7 +40,7 @@ class GetRatings(Resource):
         driver.get(url)
         links_of_current_page = [link.get_attribute('href') for link in driver.find_elements(By.TAG_NAME, "a")]
         driver.quit()
-        
+
         ratings = user_controller.get_ratings_for_user(
             userId, links_of_current_page)
         
