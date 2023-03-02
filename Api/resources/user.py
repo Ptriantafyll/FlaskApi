@@ -1,7 +1,6 @@
 from controllers import user as user_controller
 from flask import request
 from flask_restful import Resource
-from urllib.parse import urljoin
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
