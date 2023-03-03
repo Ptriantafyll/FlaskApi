@@ -1,9 +1,10 @@
 from controllers import user as user_controller
 from flask import request
 from flask_restful import Resource
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+
 
 class CreateUser(Resource):
     def post(self):
@@ -28,11 +29,18 @@ class GetRatings(Resource):
         data = request.json
         url = data["url"]
 
-        r = requests.get(url)
-        soup = BeautifulSoup(r.text, "html.parser")
-        links_of_current_page = [urljoin(url, link.get('href')) for link in soup.find_all('a')]
+        chrome_options = Options()
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        driver = webdriver.Chrome(chrome_options=chrome_options)
+
+        driver.maximize_window()
+        driver.get(url)
+        links_of_current_page = [link.get_attribute('href') for link in driver.find_elements(By.TAG_NAME, "a")]
+        driver.quit()
 
         ratings = user_controller.get_ratings_for_user(
             userId, links_of_current_page)
-
+        
         return {"user": userId, "ratings": ratings}, 200
