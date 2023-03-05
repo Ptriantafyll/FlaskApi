@@ -37,10 +37,11 @@ class GetRatings(Resource):
 
         driver.maximize_window()
         driver.get(url)
-        links_of_current_page = [link.get_attribute('href') for link in driver.find_elements(By.TAG_NAME, "a")]
+        links_of_current_page = [link.get_attribute(
+            'href') for link in driver.find_elements(By.TAG_NAME, "a")]
         driver.quit()
 
         ratings = user_controller.get_ratings_for_user(
             userId, links_of_current_page)
-        
+
         return {"user": userId, "ratings": ratings}, 200
