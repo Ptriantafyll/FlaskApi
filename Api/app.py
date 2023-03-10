@@ -2,11 +2,13 @@ from flask import Flask
 from flask_restful import Api
 import mongoDB_connection
 from flask_cors import CORS
+from flask_sslify import SSLify
 
 from resources import user as user_resources
 
 app = Flask(__name__)
 api = Api(app)
+sslify = SSLify(app)
 CORS(app)
 
 mongoDB_connection.connect_to_mongodb()
@@ -22,4 +24,4 @@ api.add_resource(user_resources.GetRatings, "/user/ratings/<string:userId>")
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, host="0.0.0.0", ssl_context=('cert.pem', 'key.pem'))
