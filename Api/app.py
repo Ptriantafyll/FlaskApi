@@ -22,4 +22,4 @@ api.add_resource(user_resources.GetRatings, "/user/ratings/<string:userId>")
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")
