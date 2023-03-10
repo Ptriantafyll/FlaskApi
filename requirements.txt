@@ -2,7 +2,6 @@ Flask
 Flask-restful
 PyMongo
 python-dotenv
-beautifulsoup4
 requests
 jupyter
 pymongoarrow
@@ -11,3 +10,4 @@ pandas
 numpy
 flask_cors
 selenium
+flask_sslify
