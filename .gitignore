@@ -2,3 +2,5 @@
 pseudocode.txt
 *__pycache__*
 *mockdata*
+cert.pem
+key.pem
