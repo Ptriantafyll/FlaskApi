@@ -6,6 +6,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
 
+class HomePage(Resource):
+    def get(self):
+        return {"message": "I am an api for a browser extension"}
+
+
 class CreateUser(Resource):
     def post(self):
         newUserId = user_controller.create_user()
