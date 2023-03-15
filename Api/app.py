@@ -16,6 +16,7 @@ mongoDB_connection.connect_to_mongodb()
 # args = parser.parse_args()
 
 # ? adding resources to endpoints
+api.add_resource(user_resources.HomePage, "/")
 api.add_resource(user_resources.CreateUser, "/user/newuser")
 api.add_resource(user_resources.NewRating, "/user/newrating")
 api.add_resource(user_resources.GetRatings, "/user/ratings/<string:userId>")

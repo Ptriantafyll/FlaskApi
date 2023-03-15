@@ -2,7 +2,6 @@ Flask
 Flask-restful
 PyMongo
 python-dotenv
-beautifulsoup4
 requests
 jupyter
 pymongoarrow
