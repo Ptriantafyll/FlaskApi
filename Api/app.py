@@ -20,6 +20,8 @@ api.add_resource(user_resources.HomePage, "/")
 api.add_resource(user_resources.CreateUser, "/user/newuser")
 api.add_resource(user_resources.NewRating, "/user/newrating")
 api.add_resource(user_resources.GetRatings, "/user/ratings/<string:userId>")
+api.add_resource(user_resources.GetNumOfRatings,
+                 "/user/numofratings/<string:userId>")
 
 
 if __name__ == '__main__':

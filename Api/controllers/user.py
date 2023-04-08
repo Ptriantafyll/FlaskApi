@@ -79,3 +79,19 @@ def get_ratings_for_user(str_userId, links_to_rate):
     # todo: later make the rating based on the model of the user
 
     return ratings
+
+
+def get_num_of_ratings_for_user(str_userId):
+    db = mongoDB_connection.db
+    user_validator = user.validator()
+    db.command("collMod", "user", validator=user_validator)
+
+    userId = ObjectId(str_userId)
+    current_user = db.get_collection("user").find_one({"_id": userId})
+
+    num_of_links = 0
+    if "links" in current_user:
+        # ? user has links
+        num_of_links = len(current_user.get("links"))
+
+    return num_of_links

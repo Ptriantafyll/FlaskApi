@@ -51,3 +51,9 @@ class GetRatings(Resource):
             userId, links_of_current_page)
 
         return {"user": userId, "ratings": ratings}, 200
+
+
+class GetNumOfRatings(Resource):
+    def get(self, userId):
+        num_of_links = user_controller.get_num_of_ratings_for_user
+        return {"num_of_rated_links": num_of_links}, 200
