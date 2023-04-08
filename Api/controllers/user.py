@@ -28,7 +28,7 @@ def user_adds_rating(userToUpdate, linkToUpdate):
     db.command("collMod", "user", validator=user_validator)
 
     userId = ObjectId(userToUpdate)
-
+    num_of_links = 0
     current_user = db.get_collection("user").find_one({"_id": userId})
     if "links" in current_user:
         # ? user has links
@@ -39,6 +39,7 @@ def user_adds_rating(userToUpdate, linkToUpdate):
             # ? link exists
             filters = {"_id": userId, "links.url": linkToUpdate["url"]}
             updates = {"$set": {"links.$.rating": linkToUpdate["rating"]}}
+            num_of_links = len(links)
         else:
             # ? link does not exist
             new_link = {"url": linkToUpdate["url"],
@@ -46,15 +47,20 @@ def user_adds_rating(userToUpdate, linkToUpdate):
             print(new_link)
             filters = {"_id": userId}
             updates = {"$push": {"links": new_link}}
+            num_of_links = len(links) + 1
     else:
         # ? user has no links
         filters = {"_id": userId}
         updates = {"$set": {"links": [linkToUpdate]}}
+        num_of_links = 1
 
     db.get_collection("user").update_one(filters, updates)
 
+    print("links of current user")
+    print(num_of_links)
+
     # todo: return meaningful message
-    return "User updated successfully"
+    return num_of_links
 
 
 def get_ratings_for_user(str_userId, links_to_rate):

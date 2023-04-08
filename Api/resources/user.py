@@ -23,10 +23,11 @@ class NewRating(Resource):
         data = request.json
         userToUpdate = data["user"]
         linkToUpdate = data["link"]
-        message = user_controller.user_adds_rating(userToUpdate, linkToUpdate)
+        num_of_links = user_controller.user_adds_rating(
+            userToUpdate, linkToUpdate)
 
         # todo: return meaningful message
-        return {"message": message}, 204
+        return {"num_of_rated_links": num_of_links}, 200
 
 
 class GetRatings(Resource):
