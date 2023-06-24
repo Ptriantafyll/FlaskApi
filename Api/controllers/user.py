@@ -56,9 +56,6 @@ def user_adds_rating(userToUpdate, linkToUpdate):
 
     db.get_collection("user").update_one(filters, updates)
 
-    print("links of current user")
-    print(num_of_links)
-
     # todo: return meaningful message
     return num_of_links
 
