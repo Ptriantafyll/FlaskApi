@@ -31,6 +31,7 @@ class NewRating(Resource):
 
 
 class GetRatings(Resource):
+    # ? generates ratings
     def post(self, userId):
         data = request.json
         url = data["url"]
