@@ -12,3 +12,4 @@ flask_cors
 selenium
 pandas
 json
+scikit-learn
