@@ -14,7 +14,7 @@ def validator():
                         "properties": {
                             "url": {
                                 "bsonType": "string",
-                                "pattern": "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
+                                "pattern": "\b(?:(?:https?|ftp):\/\/|www\.)[-a-zA-Z0-9+&@#\/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#\/%=~_|]"
                             },
                             "rating": {
                                 "enum": [1, 2, 3, 4, 5]
