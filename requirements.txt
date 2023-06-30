@@ -13,3 +13,4 @@ selenium
 pandas
 json
 scikit-learn
+nltk
