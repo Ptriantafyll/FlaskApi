@@ -5,3 +5,4 @@ pseudocode.txt
 *.pem
 *.csv
 ML/mongo*
+*bert*
