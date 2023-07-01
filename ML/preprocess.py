@@ -124,12 +124,8 @@ for word in filtered_words:
     lemmatized_words.append(lemmatizer.lemmatize(word))
 
 print(lemmatized_words)
-# todo: create tf-idf vectors
-# todo: word embedding gensim and bert
 
-
-
-
+#? lemmatizing in greek
 # import spacy
 
 # # Load the Greek language model in spacy
@@ -146,3 +142,11 @@ print(lemmatized_words)
 
 # # Print the lemmas
 # print(lemmas)
+
+# todo: create tf-idf vectors
+# todo: word embedding bert
+# todo: word embedding gensim
+
+
+
+
