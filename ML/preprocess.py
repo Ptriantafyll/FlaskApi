@@ -1,6 +1,7 @@
 
 # ? data preprocessing in this file
 
+import spacy
 import pandas as pd
 import json
 import nltk
@@ -8,8 +9,6 @@ from nltk.tokenize import word_tokenize
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-from nltk.stem import WordNetLemmatizer
-from greek_stemmer import GreekStemmer
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -48,14 +47,14 @@ driver.maximize_window()
 url = my_json_object[0]["url"]
 driver.get(url)
 website_text = driver.find_element(By.XPATH, "/html/body").text
-print(url)
-print(website_text)
+# print(url)
+# print(website_text)
 # print(type(website_text))
 
-# ? print language of page
-language_element = driver.find_element(By.TAG_NAME, "html")  # Replace 'html' with the appropriate tag name or other selector
-language = language_element.get_attribute("lang")
-print("THE LANGUAGE OF THE PAGE IS " + language)
+# ? get language of page
+language_element = driver.find_element(By.TAG_NAME, "html")
+language = language_element.get_attribute("lang")  # en-US / el
+# print("THE LANGUAGE OF THE PAGE IS " + language)
 
 driver.quit()
 
@@ -73,88 +72,40 @@ driver.quit()
 # )
 
 
-# print(my_json_object)
-# for user in my_json_object :
-#     print(user)
-
-
 # todo: feature extraction from words to vector?
 
 # nltk.download('punkt')
 # nltk.download('stopwords')
-# nltk.download('wordnet')
 
-print("making lowercase")
-lcsentence = website_text.lower()
-print(lcsentence)
+lcsentence = website_text.lower()  # ? make words lowercase
 
-# print("tokenizing")
-# words = word_tokenize(lcsentence)  # ? words to tokens
-# print(words)
-
-print("reg exp tokenizing")
-tokenizer = RegexpTokenizer(r'\w+')  # ? remove punctuation
+tokenizer = RegexpTokenizer(r'\w+')  # ? tokenizing and remove puunctuation
 words = tokenizer.tokenize(lcsentence)
-words = [word for word in words if word.isalpha()]  # ? remove numbers
+# words = [word for word in words if word.isalpha()]  # ? remove numbers
 
-print("printing stop words")
 stop_words = set(stopwords.words('english'))
-print(stop_words)
-
-# ! will need that for greek websites
-# print("printing stop words greek")
-# stop_words = set(stopwords.words('greek'))
-# print(stop_words)
-
-print("removing stop words")
 filtered_words = [w for w in words if not w in stop_words]
-# todo: probably add greek stop word removal
-# print("before")
-# print(words)
-# print("after")
-print(filtered_words)
+greek_stop_words = set(stopwords.words('greek'))
+filtered_words = [w for w in words if not w in greek_stop_words]
 
-# todo: if language = english -> stemming, else lemmatize in greek with spacy
-print("stemming")
-ps = PorterStemmer()
-stemmed_words = []  
-for word in filtered_words:
-    stemmed_words.append(ps.stem(word))
+if language == 'en-US':
+    print("stemming")
+    ps = PorterStemmer()
+    stemmed_words = []
+    for word in filtered_words:
+        stemmed_words.append(ps.stem(word))
 
-print(stemmed_words)
+    print(stemmed_words)
 
 
-# αν κάνω στεμμινγκ όχι λιματιζινγκ
-# print("lemmatizing")
-# lemmatizer = WordNetLemmatizer()
-# lemmatized_words = []  
-# for word in filtered_words:
-#     lemmatized_words.append(lemmatizer.lemmatize(word))
+if language == 'el':
+    # ? lemmatizing in greek
+    # Load the Greek language model in spacy
+    nlp = spacy.load("el_core_news_sm")
 
-# print(lemmatized_words)
-
-#? lemmatizing in greek
-# import spacy
-
-# # Load the Greek language model in spacy
-# nlp = spacy.load("el_core_news_sm")
-
-# # Text to be lemmatized
-# text = "Τα παιδιά παίζουν στο πάρκο και διασκεδάζουν."
-
-# # Tokenize the text
-# doc = nlp(text)
-
-# # Lemmatize each token
-# lemmas = [token.lemma_ for token in doc]
-
-# # Print the lemmas
-# print(lemmas)
+    lemmatized_words = []
+    for word in filtered_words:
+        lemmatized_words.append(nlp(word)[0].lemma_)
+    print(lemmatized_words)
 
 # todo: create tf-idf vectors tfidfvectorizer from sklearn
-# todo: word embedding bert
-# todo: word embedding gensim
-
-
-
-
