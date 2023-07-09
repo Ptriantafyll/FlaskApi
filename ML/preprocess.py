@@ -12,6 +12,7 @@ from nltk.stem import PorterStemmer
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 # import sys #todo: check how to make this work for a container
 # sys.path.append(
@@ -23,7 +24,7 @@ import mongoDB_connection
 df = pd.read_csv("ML/ratings.csv")
 print(df.head())
 # this returns a string with value: array of urls with their ratings
-my_string = df["links"][2]
+my_string = df["links"][0]
 # print(type(my_string))
 
 # ? convert string to json object - list of dictionarys in python
@@ -36,6 +37,7 @@ my_json_object = json.loads(my_string)
 # print(my_json_object[0]["rating"])
 
 # ? have selnium access the links text
+# todo : add a for loop that runs through every document and put everything below in it
 chrome_options = Options()
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--headless')
@@ -109,3 +111,8 @@ if language == 'el':
     print(lemmatized_words)
 
 # todo: create tf-idf vectors tfidfvectorizer from sklearn
+
+# todo: documents = all website texts
+# tfidf_vectorizer = TfidfVectorizer()
+# tfidf_vectors = tfidf_vectorizer.fit_transform(documents)
+# tfidf_vectors = tfidf_vectors.toarray()
