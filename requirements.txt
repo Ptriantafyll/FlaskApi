@@ -6,7 +6,6 @@ requests
 jupyter
 pymongoarrow
 pymongo[srv]
-pandas
 numpy
 flask_cors
 selenium
