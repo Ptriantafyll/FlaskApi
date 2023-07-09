@@ -9,6 +9,7 @@ from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
+from greek_stemmer import GreekStemmer
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -23,7 +24,7 @@ import mongoDB_connection
 df = pd.read_csv("ML/ratings.csv")
 print(df.head())
 # this returns a string with value: array of urls with their ratings
-my_string = df["links"][1]
+my_string = df["links"][2]
 # print(type(my_string))
 
 # ? convert string to json object - list of dictionarys in python
@@ -44,7 +45,7 @@ driver = webdriver.Chrome(options=chrome_options)
 
 driver.maximize_window()
 
-url = my_json_object[1]["url"]
+url = my_json_object[0]["url"]
 driver.get(url)
 website_text = driver.find_element(By.XPATH, "/html/body").text
 print(url)
@@ -113,6 +114,7 @@ filtered_words = [w for w in words if not w in stop_words]
 # print("after")
 print(filtered_words)
 
+# todo: if language = english -> stemming, else lemmatize in greek with spacy
 print("stemming")
 ps = PorterStemmer()
 stemmed_words = []  
