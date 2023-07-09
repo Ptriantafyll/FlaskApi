@@ -51,6 +51,11 @@ print(url)
 print(website_text)
 # print(type(website_text))
 
+# ? print language of page
+language_element = driver.find_element(By.TAG_NAME, "html")  # Replace 'html' with the appropriate tag name or other selector
+language = language_element.get_attribute("lang")
+print("THE LANGUAGE OF THE PAGE IS " + language)
+
 driver.quit()
 
 # todo add the texts of all websites to mongodb
@@ -110,20 +115,21 @@ print(filtered_words)
 
 print("stemming")
 ps = PorterStemmer()
-stemmed_words = []  # ! maybe make it set?
+stemmed_words = []  
 for word in filtered_words:
     stemmed_words.append(ps.stem(word))
 
 print(stemmed_words)
 
 
-print("lemmatizing")
-lemmatizer = WordNetLemmatizer()
-lemmatized_words = []  # ! maybe make it set?
-for word in filtered_words:
-    lemmatized_words.append(lemmatizer.lemmatize(word))
+# αν κάνω στεμμινγκ όχι λιματιζινγκ
+# print("lemmatizing")
+# lemmatizer = WordNetLemmatizer()
+# lemmatized_words = []  
+# for word in filtered_words:
+#     lemmatized_words.append(lemmatizer.lemmatize(word))
 
-print(lemmatized_words)
+# print(lemmatized_words)
 
 #? lemmatizing in greek
 # import spacy
@@ -143,7 +149,7 @@ print(lemmatized_words)
 # # Print the lemmas
 # print(lemmas)
 
-# todo: create tf-idf vectors
+# todo: create tf-idf vectors tfidfvectorizer from sklearn
 # todo: word embedding bert
 # todo: word embedding gensim
 
