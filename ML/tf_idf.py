@@ -73,8 +73,6 @@ driver.quit()
 # )
 
 
-# todo: feature extraction from words to vector?
-
 # nltk.download('punkt')
 # nltk.download('stopwords')
 
@@ -112,6 +110,8 @@ if language == 'el':
 # todo: create tf-idf vectors tfidfvectorizer from sklearn
 
 # todo: documents = all website texts
+# documents = [" ".join(tokens) for tokens in tokenized_documents]
+
 # tfidf_vectorizer = TfidfVectorizer()
 # tfidf_vectors = tfidf_vectorizer.fit_transform(documents)
 # tfidf_vectors = tfidf_vectors.toarray()
