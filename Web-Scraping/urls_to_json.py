@@ -47,7 +47,7 @@ def urls_with_res_status_200_to_json():
 # ? Gets links from a json file
 # ? all urls with specified language -> specified.json
 # ? all urls with not specified language -> not_specified.json
-def urls_with_specified_language_to_json(file_path):
+def urls_language_to_json(file_path):
 
     f = open(file_path)
     urls = json.load(f)
@@ -84,7 +84,8 @@ def urls_with_specified_language_to_json(file_path):
         json.dump(errors, json_file)
 
 
-# urls_with_specified_language_to_json(
-    # r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\specified.json")
+# urls_with_res_status_200_to_json(
+    # r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\allowed.json")
 
-# urls_with_res_status_200_to_json()
+# urls_language_to_json(
+    # r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\specified.json")
