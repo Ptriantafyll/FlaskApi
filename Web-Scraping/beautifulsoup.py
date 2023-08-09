@@ -1,13 +1,10 @@
 
-from bson.objectid import ObjectId
 import json
 import requests
 from bs4 import BeautifulSoup
 import mongoDB_connection
-import time
 
 
-# todo add the texts of all websites to mongodb
 mongoDB_connection.connect_to_mongodb()
 db = mongoDB_connection.db
 db.command("collMod", "url", validator=mongoDB_connection.validator())
