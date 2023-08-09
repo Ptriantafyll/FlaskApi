@@ -84,6 +84,10 @@ def urls_language_to_json(file_path):
         json.dump(errors, json_file)
 
 
+def urls_not_allowed_by_bs4_to_json(file_path):
+    f = open(file_path)
+    urls = json.load(f)
+
 # urls_with_res_status_200_to_json(
     # r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\allowed.json")
 
