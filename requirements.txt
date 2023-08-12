@@ -16,4 +16,4 @@ nltk
 spacy
 requests
 beautifulsoup4
-html5lib
+undetected_chromedriver
