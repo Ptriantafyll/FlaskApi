@@ -98,8 +98,6 @@ def urls_not_allowed_by_bs4_to_json(file_path):
     f = open(file_path)
     urls = json.load(f)
     failed, successful = {}, {}
-    # todo : for every file if timeout -> failed.json
-    # todo : for every file if success -> successful.json
     for url in urls:
         # ? using undetected selenium
         options = uc.ChromeOptions()
