@@ -26,10 +26,12 @@ def insert_urls_with_specified_language(file_path):
             # ? Get the language of the page
             html_tag = soup.find('html')
             if html_tag and 'lang' in html_tag.attrs:
-                language = html_tag['lang']
-                new_link = {"url": url, "text": website_text,
-                            "language": language}
-                db.get_collection("url").insert_one(new_link)
+                if not db.get_collection('url').find_one({"url": url}):
+                    # ? check if url exists in the collection already
+                    language = html_tag['lang']
+                    new_link = {"url": url, "text": website_text,
+                                "language": language}
+                    db.get_collection("url").insert_one(new_link)
             else:
                 print("The language of the page ", url, "is not specified")
 
@@ -51,10 +53,11 @@ def insert_urls_with_lang_from_json_file(file_path):
             soup = BeautifulSoup(html_content, 'html.parser')
             website_text = soup.get_text()
 
-            new_link = {"url": url, "text": website_text,
-                        "language": language}
-            db.get_collection("url").insert_one(new_link)
-            print("inserted")
+            if not db.get_collection('url').find_one({"url": url}):
+                # ? check if the url exists in the collection already
+                new_link = {"url": url, "text": website_text,
+                            "language": language}
+                db.get_collection("url").insert_one(new_link)
         except Exception as e:
             print(url, " ", type(e))
 
@@ -66,24 +69,24 @@ def insert_urls_with_lang_from_json_file(file_path):
 
 # ? Scraping with beautifulsoup
 
-url = "https://chat.openai.com/"
-print(url)
-# start_time = time.time()
-response = requests.get(url)
-# end_time = time.time()
-print(response.status_code)
-# print("time: ", end_time - start_time)
+# url = "https://chat.openai.com/"
+# print(url)
+# # start_time = time.time()
+# response = requests.get(url)
+# # end_time = time.time()
+# print(response.status_code)
+# # print("time: ", end_time - start_time)
 
-# Check if the request was successful
-if response.status_code == 200:
-    html_content = response.text
-else:
-    print(
-        f"Failed to retrieve the website. Status code: {response.status_code}")
+# # Check if the request was successful
+# if response.status_code == 200:
+#     html_content = response.text
+# else:
+#     print(
+#         f"Failed to retrieve the website. Status code: {response.status_code}")
 
-soup = BeautifulSoup(html_content, 'html.parser')
-website_text = soup.get_text()
-print(website_text)
+# soup = BeautifulSoup(html_content, 'html.parser')
+# website_text = soup.get_text()
+# print(website_text)
 
 
 # ? Get the language of the page
