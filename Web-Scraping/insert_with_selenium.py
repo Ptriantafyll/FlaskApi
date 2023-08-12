@@ -1,12 +1,14 @@
 import json
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+import time
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import undetected_chromedriver as uc
+import mongoDB_connection
+
+mongoDB_connection.connect_to_mongodb()
+db = mongoDB_connection.db
+db.command("collMod", "url", validator=mongoDB_connection.validator())
 
 
 # ? gets urls from a json file
@@ -14,27 +16,46 @@ def insert_urls_not_allowed_by_bs4(file_path):
     f = open(file_path)
     urls = json.load(f)
     for url in urls:
+        # ? using undetected selenium
+        options = uc.ChromeOptions()
+        options.add_argument("--headless=new")
+        driver = uc.Chrome(options=options)
+
         try:
-            chrome_options = Options()
-            chrome_options.add_argument('--no-sandbox')
-            chrome_options.add_argument('--headless')
-            chrome_options.add_argument('--disable-dev-shm-usage')
-
-            driver = webdriver.Chrome(options=chrome_options)
-            driver.maximize_window()
             driver.get(url)
+            time.sleep(5)
 
-            website_text = driver.find_element(By.XPATH, "/html/body").text
-            print(website_text)
             timeout = 10
+            wait = WebDriverWait(driver, timeout)
+            # ? check if website has a body
+            element_present = EC.presence_of_element_located(
+                (By.XPATH, "/html/body"))
+
+            wait.until(element_present)
+            print(url, " loaded successfully!")
+            website_text = driver.find_element(By.XPATH, "/html/body").text
+            language = driver.find_element(
+                By.XPATH, "//html").get_attribute('lang')
+
+            print(url, ": ", language)
+
+            # todo: insert into mongodb
+            if not db.get_collection('url').find_one({"url": url}):
+                # ? url does not exist in the collection
+                new_link = {"url": url, "text": website_text,
+                            "language": language}
+                db.get_collection("url").insert_one(new_link)
+                print("inserted ", url)
+
         except Exception as e:
-            print(url, " ", type(e))
+            print("error" + str(e))
         finally:
+            print("quitting driver")
             driver.quit()
 
 
-# insert_urls_not_allowed_by_bs4(
-    # r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\not_allowed.json")
+insert_urls_not_allowed_by_bs4(
+    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\not_allowed.json")
 
 # ? Scraping with selenium
 # chrome_options = Options()
