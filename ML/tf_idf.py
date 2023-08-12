@@ -59,20 +59,6 @@ language = language_element.get_attribute("lang")  # en-US / el
 
 driver.quit()
 
-# todo add the texts of all websites to mongodb
-
-# mongoDB_connection.connect_to_mongodb()  # todo: maybe remove that later
-
-# db = mongoDB_connection.db
-# collection = db.get_collection("url")
-# collection.insert_one(
-#     {
-#         "url": my_json_object[0]["url"],
-#         "text": website_text
-#     }
-# )
-
-
 # nltk.download('punkt')
 # nltk.download('stopwords')
 
