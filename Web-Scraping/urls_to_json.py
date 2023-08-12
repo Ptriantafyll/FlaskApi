@@ -1,6 +1,8 @@
 
-# ? This file will import the text of all websites rated into mongodb url collection
-# import time
+# ? This file will import the text of all websites rated into json files
+import time
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 import json
 import requests
 from bs4 import BeautifulSoup
@@ -23,9 +25,7 @@ def urls_with_res_status_200_to_json():
     urls = set()
     users = db['user'].find()
     for user in users:
-        print(user["_id"])
         for link in user["links"]:
-            print(link["url"])
             url = link["url"]
 
             if url in urls:
@@ -39,9 +39,19 @@ def urls_with_res_status_200_to_json():
                 if response.status_code == 200:
                     allowed[url] = response.status_code
                 else:
+                    not_allowed[url] = response.status_code
                     continue
             except Exception as e:
+                not_allowed[url] = str(e)
                 continue
+    allowed_path = r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\new_allowed.json"
+    not_allowed_path = r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\new_not_allowed.json"
+
+    with open(allowed_path, 'w') as json_file:
+        json.dump(allowed, json_file)
+
+    with open(not_allowed_path, 'w') as json_file:
+        json.dump(not_allowed, json_file)
 
 
 # ? Gets links from a json file
@@ -87,9 +97,50 @@ def urls_language_to_json(file_path):
 def urls_not_allowed_by_bs4_to_json(file_path):
     f = open(file_path)
     urls = json.load(f)
+    failed, successful = {}, {}
+    # todo : for every file if timeout -> failed.json
+    # todo : for every file if success -> successful.json
+    for url in urls:
+        # ? using undetected selenium
+        options = uc.ChromeOptions()
+        options.add_argument("--headless=new")
+        driver = uc.Chrome(options=options)
 
-# urls_with_res_status_200_to_json(
-    # r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\allowed.json")
+        try:
+            driver.get(url)
+            time.sleep(5)
+
+            timeout = 10
+            wait = WebDriverWait(driver, timeout)
+            # ? check if website has a body
+            element_present = EC.presence_of_element_located(
+                (By.XPATH, "/html/body"))
+
+            wait.until(element_present)
+            print(url + " loaded successfully!")
+            successful[url] = "success"
+        except Exception as e:
+            print("error" + str(e))
+            failed[url] = "failed"
+        finally:
+            print("quitting driver")
+            driver.quit()
+
+    successful_path = r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\successful.json"
+    failed_path = r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\failed.json"
+
+    with open(successful_path, 'w') as json_file:
+        json.dump(successful, json_file)
+
+    with open(failed_path, 'w') as json_file:
+        json.dump(failed, json_file)
+
+
+# urls_with_res_status_200_to_json()
 
 # urls_language_to_json(
-    # r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\specified.json")
+#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\specified.json")
+
+
+# urls_not_allowed_by_bs4_to_json(
+#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\not_allowed.json")
