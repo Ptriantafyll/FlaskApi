@@ -1,99 +1,83 @@
 
 # ? data preprocessing in this file
 
-import spacy
-import pandas as pd
 import json
+import spacy
 import nltk
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-# import sys #todo: check how to make this work for a container
-# sys.path.append(
-#     # probably change this to the container path to folder
-#     'C:/Users/ptria/source/repos/FlaskApi/Api'
-# )
-import mongoDB_connection
 
-df = pd.read_csv("ML/ratings.csv")
-print(df.head())
-# this returns a string with value: array of urls with their ratings
-my_string = df["links"][0]
-# print(type(my_string))
+# user_file = open("users.json")
+# users = json.load(user_file)
 
-# ? convert string to json object - list of dictionarys in python
-my_json_object = json.loads(my_string)
-# print(type(my_json_object))
-# print(my_json_object)
+url_file = open("urls.json")
+urls = json.load(url_file)
 
-# ? how to access urls and ratings
-# print(my_json_object[0]["url"])
-# print(my_json_object[0]["rating"])
 
-# ? have selnium access the links text
-# todo : add a for loop that runs through every document and put everything below in it
-chrome_options = Options()
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--headless')
-chrome_options.add_argument('--disable-dev-shm-usage')
-driver = webdriver.Chrome(options=chrome_options)
+# for user in users:
+# for link in user["links"]:
+# print(link['url'])
+# print(link["rating"])s
 
-driver.maximize_window()
+# for link in urls:
+# if(link['language'] != ""):
+# continue
 
-url = my_json_object[0]["url"]
-driver.get(url)
-website_text = driver.find_element(By.XPATH, "/html/body").text
-# print(url)
-# print(website_text)
-# print(type(website_text))
+# print(link['url'], " : ", link['language'])
 
-# ? get language of page
-language_element = driver.find_element(By.TAG_NAME, "html")
-language = language_element.get_attribute("lang")  # en-US / el
-# print("THE LANGUAGE OF THE PAGE IS " + language)
 
-driver.quit()
-
-# nltk.download('punkt')
 # nltk.download('stopwords')
 
-lcsentence = website_text.lower()  # ? make words lowercase
+# print(urls[0]["url"])
+# print(urls[0]['text'])
+text = urls[0]['text']
 
+lower_case_text = text.lower()  # ? make words lowercase
 tokenizer = RegexpTokenizer(r'\w+')  # ? tokenizing and remove puunctuation
-words = tokenizer.tokenize(lcsentence)
+words = tokenizer.tokenize(lower_case_text)
 # words = [word for word in words if word.isalpha()]  # ? remove numbers
+# print(words)
 
-stop_words = set(stopwords.words('english'))
-filtered_words = [w for w in words if not w in stop_words]
-greek_stop_words = set(stopwords.words('greek'))
-filtered_words = [w for w in words if not w in greek_stop_words]
 
-if language == 'en-US':
+# nltk.download('stopwords')
+
+
+if 'en' in urls[0]['language']:
+    # remove stop words
+    stop_words = set(stopwords.words('english'))
+    filtered_words = [w for w in words if not w in stop_words]
+    # print(filtered_words)
+
     print("stemming")
     ps = PorterStemmer()
     stemmed_words = []
     for word in filtered_words:
         stemmed_words.append(ps.stem(word))
 
-    print(stemmed_words)
+    # print(stemmed_words)
 
 
-if language == 'el':
+if 'el' in urls[0]['language']:
     # ? lemmatizing in greek
     # Load the Greek language model in spacy
     nlp = spacy.load("el_core_news_sm")
 
+    # remove stop words
+    greek_stop_words = set(stopwords.words('greek'))
+    filtered_words = [w for w in words if not w in greek_stop_words]
+
+    # lemmatize in greek
     lemmatized_words = []
     for word in filtered_words:
         lemmatized_words.append(nlp(word)[0].lemma_)
     print(lemmatized_words)
 
+
 # todo: create tf-idf vectors tfidfvectorizer from sklearn
+
 
 # todo: documents = all website texts
 # documents = [" ".join(tokens) for tokens in tokenized_documents]
