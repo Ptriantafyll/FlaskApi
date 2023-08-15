@@ -1,87 +1,88 @@
-
-# ? data preprocessing in this file
-
 import json
 import spacy
 import nltk
+import pickle
+import numpy as np
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+url_file = open(
+    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf8")
 
-# user_file = open("users.json")
-# users = json.load(user_file)
-
-url_file = open("urls.json")
 urls = json.load(url_file)
 
-
-# for user in users:
-# for link in user["links"]:
-# print(link['url'])
-# print(link["rating"])s
-
-# for link in urls:
-# if(link['language'] != ""):
-# continue
-
-# print(link['url'], " : ", link['language'])
-
-
 # nltk.download('stopwords')
 
-# print(urls[0]["url"])
-# print(urls[0]['text'])
-text = urls[0]['text']
+nlp_greek = spacy.load("el_core_news_sm")
+nlp_english = spacy.load("en_core_web_sm")
 
-lower_case_text = text.lower()  # ? make words lowercase
-tokenizer = RegexpTokenizer(r'\w+')  # ? tokenizing and remove puunctuation
-words = tokenizer.tokenize(lower_case_text)
-# words = [word for word in words if word.isalpha()]  # ? remove numbers
-# print(words)
+print(len(urls))
 
+tokenized_documents = []
+for i in range(len(urls)):
+    text = urls[i]['text']
+    print(urls[i]['url'], " : ", urls[i]['language'])
 
-# nltk.download('stopwords')
+    lower_case_text = text.lower()  # ? make text lowercase
+    tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove puunctuation
+    words = tokenizer.tokenize(lower_case_text)
+    words = [word for word in words if word.isalpha()]  # ? remove numbers
 
+    # print(words)
 
-if 'en' in urls[0]['language']:
-    # remove stop words
-    stop_words = set(stopwords.words('english'))
-    filtered_words = [w for w in words if not w in stop_words]
-    # print(filtered_words)
+    if 'en' in urls[i]['language']:
+        # remove stop words
+        stop_words = set(stopwords.words('english'))
+        filtered_words = [w for w in words if not w in stop_words]
+        # print(filtered_words)
 
-    print("stemming")
-    ps = PorterStemmer()
-    stemmed_words = []
-    for word in filtered_words:
-        stemmed_words.append(ps.stem(word))
+        # print("stemming english")
+        ps = PorterStemmer()
+        stemmed_words = [ps.stem(word) for word in filtered_words]
 
-    # print(stemmed_words)
+        # print(stemmed_words)
+        tokenized_documents.append(stemmed_words)
 
+    if 'el' in urls[i]['language']:
+        # remove stop words
+        greek_stop_words = set(stopwords.words('greek'))
+        filtered_words = [w for w in words if not w in greek_stop_words]
 
-if 'el' in urls[0]['language']:
-    # ? lemmatizing in greek
-    # Load the Greek language model in spacy
-    nlp = spacy.load("el_core_news_sm")
+        # print("lemmatizing greek")
+        lemmatized_words = []
+        lemmatized_words = [nlp_english(token)[0].lemma_ if token.isascii(
+        ) else nlp_greek(token)[0].lemma_ for token in filtered_words]
+        tokenized_documents.append(lemmatized_words)
+        # print(lemmatized_words)
 
-    # remove stop words
-    greek_stop_words = set(stopwords.words('greek'))
-    filtered_words = [w for w in words if not w in greek_stop_words]
-
-    # lemmatize in greek
-    lemmatized_words = []
-    for word in filtered_words:
-        lemmatized_words.append(nlp(word)[0].lemma_)
-    print(lemmatized_words)
-
-
-# todo: create tf-idf vectors tfidfvectorizer from sklearn
+# for doc in tokenized_documents:
+#   print(doc)
 
 
-# todo: documents = all website texts
-# documents = [" ".join(tokens) for tokens in tokenized_documents]
+# CREATE TF IDF VECTORIZER
+documents = [" ".join(tokens) for tokens in tokenized_documents]
 
-# tfidf_vectorizer = TfidfVectorizer()
-# tfidf_vectors = tfidf_vectorizer.fit_transform(documents)
-# tfidf_vectors = tfidf_vectors.toarray()
+tfidf_vectorizer = TfidfVectorizer()
+tfidf_vectors = tfidf_vectorizer.fit_transform(documents)
+tfidf_vectors = tfidf_vectors.toarray()
+feature_names = tfidf_vectorizer.get_feature_names_out()
+
+# for vector in tfidf_vectors:
+#   print(vector)
+
+# ? print nonzero values
+non_zero_indices = np.nonzero(tfidf_vectors)
+for row, col in zip(*non_zero_indices):
+    print(
+        f"Document {row}, Term '{feature_names[col]}': {tfidf_vectors[row, col]}")
+
+
+# Save the vectorizer to a file
+with open(r"C:\Users\ptria\source\repos\FlaskApi\ML\tfidf_vectorizer.pkl", 'wb') as f:
+    pickle.dump(tfidf_vectorizer, f)
+
+# Load the vectorizer from the file
+# with open('tfidf_vectorizer.pkl', 'rb') as f:
+#     loaded_tfidf_vectorizer = pickle.load(f)
