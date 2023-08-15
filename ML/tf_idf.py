@@ -1,103 +1,88 @@
-
-# ? data preprocessing in this file
-
-import spacy
-import pandas as pd
 import json
+import spacy
 import nltk
+import pickle
+import numpy as np
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-# import sys #todo: check how to make this work for a container
-# sys.path.append(
-#     # probably change this to the container path to folder
-#     'C:/Users/ptria/source/repos/FlaskApi/Api'
-# )
-import mongoDB_connection
+url_file = open(
+    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf8")
 
-df = pd.read_csv("ML/ratings.csv")
-print(df.head())
-# this returns a string with value: array of urls with their ratings
-my_string = df["links"][0]
-# print(type(my_string))
+urls = json.load(url_file)
 
-# ? convert string to json object - list of dictionarys in python
-my_json_object = json.loads(my_string)
-# print(type(my_json_object))
-# print(my_json_object)
-
-# ? how to access urls and ratings
-# print(my_json_object[0]["url"])
-# print(my_json_object[0]["rating"])
-
-# ? have selnium access the links text
-# todo : add a for loop that runs through every document and put everything below in it
-chrome_options = Options()
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--headless')
-chrome_options.add_argument('--disable-dev-shm-usage')
-driver = webdriver.Chrome(options=chrome_options)
-
-driver.maximize_window()
-
-url = my_json_object[0]["url"]
-driver.get(url)
-website_text = driver.find_element(By.XPATH, "/html/body").text
-# print(url)
-# print(website_text)
-# print(type(website_text))
-
-# ? get language of page
-language_element = driver.find_element(By.TAG_NAME, "html")
-language = language_element.get_attribute("lang")  # en-US / el
-# print("THE LANGUAGE OF THE PAGE IS " + language)
-
-driver.quit()
-
-# nltk.download('punkt')
 # nltk.download('stopwords')
 
-lcsentence = website_text.lower()  # ? make words lowercase
+nlp_greek = spacy.load("el_core_news_sm")
+nlp_english = spacy.load("en_core_web_sm")
 
-tokenizer = RegexpTokenizer(r'\w+')  # ? tokenizing and remove puunctuation
-words = tokenizer.tokenize(lcsentence)
-# words = [word for word in words if word.isalpha()]  # ? remove numbers
+print(len(urls))
 
-stop_words = set(stopwords.words('english'))
-filtered_words = [w for w in words if not w in stop_words]
-greek_stop_words = set(stopwords.words('greek'))
-filtered_words = [w for w in words if not w in greek_stop_words]
+tokenized_documents = []
+for i in range(len(urls)):
+    text = urls[i]['text']
+    print(urls[i]['url'], " : ", urls[i]['language'])
 
-if language == 'en-US':
-    print("stemming")
-    ps = PorterStemmer()
-    stemmed_words = []
-    for word in filtered_words:
-        stemmed_words.append(ps.stem(word))
+    lower_case_text = text.lower()  # ? make text lowercase
+    tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove puunctuation
+    words = tokenizer.tokenize(lower_case_text)
+    words = [word for word in words if word.isalpha()]  # ? remove numbers
 
-    print(stemmed_words)
+    # print(words)
+
+    if 'en' in urls[i]['language']:
+        # remove stop words
+        stop_words = set(stopwords.words('english'))
+        filtered_words = [w for w in words if not w in stop_words]
+        # print(filtered_words)
+
+        # print("stemming english")
+        ps = PorterStemmer()
+        stemmed_words = [ps.stem(word) for word in filtered_words]
+
+        # print(stemmed_words)
+        tokenized_documents.append(stemmed_words)
+
+    if 'el' in urls[i]['language']:
+        # remove stop words
+        greek_stop_words = set(stopwords.words('greek'))
+        filtered_words = [w for w in words if not w in greek_stop_words]
+
+        # print("lemmatizing greek")
+        lemmatized_words = []
+        lemmatized_words = [nlp_english(token)[0].lemma_ if token.isascii(
+        ) else nlp_greek(token)[0].lemma_ for token in filtered_words]
+        tokenized_documents.append(lemmatized_words)
+        # print(lemmatized_words)
+
+# for doc in tokenized_documents:
+#   print(doc)
 
 
-if language == 'el':
-    # ? lemmatizing in greek
-    # Load the Greek language model in spacy
-    nlp = spacy.load("el_core_news_sm")
+# CREATE TF IDF VECTORIZER
+documents = [" ".join(tokens) for tokens in tokenized_documents]
 
-    lemmatized_words = []
-    for word in filtered_words:
-        lemmatized_words.append(nlp(word)[0].lemma_)
-    print(lemmatized_words)
+tfidf_vectorizer = TfidfVectorizer()
+tfidf_vectors = tfidf_vectorizer.fit_transform(documents)
+tfidf_vectors = tfidf_vectors.toarray()
+feature_names = tfidf_vectorizer.get_feature_names_out()
 
-# todo: create tf-idf vectors tfidfvectorizer from sklearn
+# for vector in tfidf_vectors:
+#   print(vector)
 
-# todo: documents = all website texts
-# documents = [" ".join(tokens) for tokens in tokenized_documents]
+# ? print nonzero values
+non_zero_indices = np.nonzero(tfidf_vectors)
+for row, col in zip(*non_zero_indices):
+    print(
+        f"Document {row}, Term '{feature_names[col]}': {tfidf_vectors[row, col]}")
 
-# tfidf_vectorizer = TfidfVectorizer()
-# tfidf_vectors = tfidf_vectorizer.fit_transform(documents)
-# tfidf_vectors = tfidf_vectors.toarray()
+
+# Save the vectorizer to a file
+with open(r"C:\Users\ptria\source\repos\FlaskApi\ML\tfidf_vectorizer.pkl", 'wb') as f:
+    pickle.dump(tfidf_vectorizer, f)
+
+# Load the vectorizer from the file
+# with open('tfidf_vectorizer.pkl', 'rb') as f:
+#     loaded_tfidf_vectorizer = pickle.load(f)
