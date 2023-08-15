@@ -25,6 +25,8 @@ pip install -r requirements.txt
 
 If you do not have pip installed see [here](https://pip.pypa.io/en/stable/installation/) for instructions
 
+`python -m spacy download el_core_news_sm`
+`python -m spacy download en_core_web_sm`
 ## Development
 
 Run the following command in a terminal and then navigate to localhost:5000 on a browser
