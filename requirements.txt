@@ -17,3 +17,4 @@ spacy
 requests
 beautifulsoup4
 undetected_chromedriver
+gensim
