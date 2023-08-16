@@ -8,3 +8,6 @@ ML/mongo*
 Web-Scraping/mongo*
 *.json*
 *.pkl*
+*word2vec*
+*.bin*
+*.vec*
