@@ -19,3 +19,5 @@ beautifulsoup4
 undetected_chromedriver
 gensim
 fasttext
+transformers
+torch
