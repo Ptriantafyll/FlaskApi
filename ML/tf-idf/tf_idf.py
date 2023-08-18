@@ -18,6 +18,10 @@ urls = json.load(url_file)
 nlp_greek = spacy.load("el_core_news_sm")
 nlp_english = spacy.load("en_core_web_sm")
 
+greek_stop_words_file = open(
+    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\greek_stop_words.json", encoding="utf8")
+greek_stop_words = json.load(greek_stop_words_file)
+
 print(len(urls))
 
 tokenized_documents = []
@@ -32,24 +36,20 @@ for i in range(len(urls)):
 
     # print(words)
 
-    if 'en' in urls[i]['language']:
-        # remove stop words
-        stop_words = set(stopwords.words('english'))
-        filtered_words = [w for w in words if not w in stop_words]
-        # print(filtered_words)
+    # ? remove english and greek stop words
+    stop_words = set(stopwords.words('english'))
+    filtered_words = [
+        w for w in words if not w in stop_words and not w in greek_stop_words and len(w) > 1]
+    words.append(filtered_words)
 
+    if 'en' in urls[i]['language']:
         # print("stemming english")
         ps = PorterStemmer()
         stemmed_words = [ps.stem(word) for word in filtered_words]
-
-        # print(stemmed_words)
         tokenized_documents.append(stemmed_words)
+        # print(stemmed_words)
 
     if 'el' in urls[i]['language']:
-        # remove stop words
-        greek_stop_words = set(stopwords.words('greek'))
-        filtered_words = [w for w in words if not w in greek_stop_words]
-
         # print("lemmatizing greek")
         lemmatized_words = []
         lemmatized_words = [nlp_english(token)[0].lemma_ if token.isascii(
