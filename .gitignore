@@ -5,6 +5,7 @@ pseudocode.txt
 *.pem
 *.csv
 ML/mongo*
+ML/*/mongo*
 Web-Scraping/mongo*
 *.json*
 *.pkl*
