@@ -3,6 +3,7 @@ import spacy
 import nltk
 import pickle
 import numpy as np
+import unicodedata
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
@@ -10,11 +11,15 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 url_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf8")
-
 urls = json.load(url_file)
 
-# nltk.download('stopwords')
 
+def strip_accents_and_lowercase(s):
+    return ''.join(c for c in unicodedata.normalize('NFD', s)
+                   if unicodedata.category(c) != 'Mn').lower()
+
+
+# nltk.download('stopwords')
 nlp_greek = spacy.load("el_core_news_sm")
 nlp_english = spacy.load("en_core_web_sm")
 
@@ -29,7 +34,8 @@ for i in range(len(urls)):
     text = urls[i]['text']
     print(urls[i]['url'], " : ", urls[i]['language'])
 
-    lower_case_text = text.lower()  # ? make text lowercase
+    # lower_case_text = text.lower()  # ? make text lowercase
+    lower_case_text = strip_accents_and_lowercase(text)
     tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove puunctuation
     words = tokenizer.tokenize(lower_case_text)
     words = [word for word in words if word.isalpha()]  # ? remove numbers
@@ -80,7 +86,7 @@ for row, col in zip(*non_zero_indices):
 
 
 # Save the vectorizer to a file
-with open(r"C:\Users\ptria\source\repos\FlaskApi\ML\tfidf_vectorizer.pkl", 'wb') as f:
+with open(r"C:\Users\ptria\source\repos\FlaskApi\ML\tf-idf\tfidf_vectorizer.pkl", 'wb') as f:
     pickle.dump(tfidf_vectorizer, f)
 
 # Load the vectorizer from the file
