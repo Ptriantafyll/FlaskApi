@@ -16,7 +16,10 @@ db = mongoDB_connection.db
 users = db['user'].find()
 
 # print(users[0]["_id"])
+
+# todo ? cluster of users
 user = users[0]
+print("User is: ", user["_id"])
 
 # todo: Step 2: Load and preprocess labeled urls of the user
 f = open(r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json",
@@ -34,7 +37,10 @@ print(urls[0]["url"])
 nlp_greek = spacy.load("el_core_news_sm")
 nlp_english = spacy.load("en_core_web_sm")
 
+ratings = []
+tokenized_documents = []
 for link in user["links"]:
+    ratings.append(link["rating"])
     # ? check if the url exists to get the text, otherwise use selenium?
     for url in urls:
         if link["url"] == url["url"]:
@@ -43,8 +49,7 @@ for link in user["links"]:
             break
 
     # ? text now has the text of the url
-    tokenized_documents = []
-    print(link['url'], " : ", language)
+    print(link['url'], " : ", link["rating"])
 
     lower_case_text = text.lower()  # ? make text lowercase
     tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove punctuation
@@ -78,7 +83,8 @@ for link in user["links"]:
 # for doc in tokenized_documents:
 #     print(doc)
 
-
+# ? tokenized_documents, rating
+print(ratings)
 # todo: Step 3: TF-IDF Transformation (of the text of the urls)
 # Load the vectorizer from the file
 # with open(r"C:\Users\ptria\source\repos\FlaskApi\ML\tf-idf\tfidf_vectorizer.pkl", 'rb') as f:
