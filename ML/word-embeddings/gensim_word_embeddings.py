@@ -10,7 +10,9 @@ import logging
 
 def preprocess_document(doc):
     stop_words = set(stopwords.words('english'))
-    greek_stop_words = set(stopwords.words('greek'))
+    greek_stop_words_file = open(
+        r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\greek_stop_words.json", encoding="utf8")
+    greek_stop_words = json.load(greek_stop_words_file)
 
     tokens = word_tokenize(doc.lower())  # ?Tokenize and lowercase
     # ?Remove punctuation and stopwords
@@ -40,11 +42,11 @@ model.train(documents, total_examples=len(documents), epochs=10)
 
 
 # Save the model to a file (optional)
-# model.save(r"C:\Users\ptria\source\repos\FlaskApi\ML\word2vec_model")
+# model.save(r"C:\Users\ptria\source\repos\FlaskApi\ML\word-embeddings\word2vec_model")
 
 # Load the model from a file (if needed)
 # model = Word2Vec.load(
-#     r"C:\Users\ptria\source\repos\FlaskApi\ML\word2vec_model")
+#     r"C:\Users\ptria\source\repos\FlaskApi\ML\word-embeddings\word2vec_model")
 
 # ? example most similar words
 # w = "μπύρα"
