@@ -44,10 +44,6 @@ model.train(documents, total_examples=len(documents), epochs=10)
 # Save the model to a file (optional)
 # model.save(r"C:\Users\ptria\source\repos\FlaskApi\ML\word-embeddings\word2vec_model")
 
-# Load the model from a file (if needed)
-# model = Word2Vec.load(
-#     r"C:\Users\ptria\source\repos\FlaskApi\ML\word-embeddings\word2vec_model")
-
 # ? example most similar words
 # w = "μπύρα"
 # print("most similar to: ", w)
