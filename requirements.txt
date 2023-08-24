@@ -21,3 +21,4 @@ gensim
 fasttext
 transformers
 torch
+keras
