@@ -1,6 +1,7 @@
 from sklearn.metrics import accuracy_score, mean_squared_error, f1_score, r2_score
 from sklearn.model_selection import train_test_split
-from keras.layers import Embedding, LSTM, Dense
+from keras.layers import Embedding, LSTM, Dense, GlobalAveragePooling1D
+from keras.optimizers import Adam
 from keras.models import Sequential
 from keras.preprocessing.sequence import pad_sequences
 import tensorflow as tf
@@ -19,7 +20,8 @@ user_file = open(
 users = json.load(user_file)
 
 # todo ? cluster of users
-user = users[11]
+user = users[2]
+# user = users[3] - user with the least # of ratings -> fast model training
 print("User is: ", user["_id"])
 
 url_file = open(
@@ -92,26 +94,89 @@ LSTM_model.add(Dense(5, activation='softmax'))
 # Compile LSTM model
 LSTM_model.compile(
     optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+# LSTM_model.compile(
+# optimizer=Adam(learning_rate=0.01), loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-
+print(LSTM_model.summary())
 LSTM_model.fit(documents_train, ratings_train,  validation_data=(
     documents_test, ratings_test), epochs=10, batch_size=32)
 
 
-# Step 4: Model Evaluation
-ratings_pred = LSTM_model.predict(documents_test)
-accuracy_lstm = accuracy_score(ratings_test, ratings_pred)
-print("Decision Tree Accuracy:", accuracy_lstm)
-# Calculate Mean Squared Error
-mse = mean_squared_error(ratings_test, ratings)
-print("Mean Squared Error:", mse)
-# Calculate F1 score
-f1 = f1_score(ratings_test, ratings_pred, average="weighted")
-print("F1 Score:", f1)
-# Calculate R2 score
-r2 = r2_score(ratings_test, ratings_pred)
-print("R2 Score:", r2)
+# Evaluate the model on the test data
+loss, accuracy = LSTM_model.evaluate(
+    documents_test, ratings_test)
 
-print(ratings_pred)
+# Print the evaluation results
+print("Test Loss:", loss)
+print("Test Accuracy:", accuracy)
+
+predictions = LSTM_model.predict(documents_test)
+predicted_classes = np.argmax(predictions, axis=1)
 print(ratings_test)
+print(predicted_classes)
+
+predictions = LSTM_model.predict(documents_train)
+predicted_classes = np.argmax(predictions, axis=1)
 print(ratings_train)
+print(predicted_classes)
+
+# # ? dense model
+# model = Sequential()
+# model.add(embedding_layer)
+# # Add a GlobalAveragePooling1D layer to aggregate sequence information
+# model.add(GlobalAveragePooling1D())
+# model.add(Dense(128, activation='relu'))
+# model.add(Dense(5, activation='softmax'))
+
+# model.compile(optimizer='adam',
+#               loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+# # model.compile(optimizer=Adam(learning_rate=0.001),
+# #   loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+
+# print(documents_train.shape)
+# print(ratings_train.shape)
+# print(documents_test.shape)
+# print(ratings_test.shape)
+
+# print(model.summary())
+
+# model.fit(documents_train, ratings_train, validation_data=(
+#     documents_test, ratings_test), epochs=10, batch_size=32)
+
+# # Evaluate the model on the test data
+# loss, accuracy = model.evaluate(
+#     documents_test, ratings_test)
+
+# # Print the evaluation results
+# print("Test Loss:", loss)
+# print("Test Accuracy:", accuracy)
+
+# predictions = model.predict(documents_test)
+# predicted_classes = np.argmax(predictions, axis=1)
+# print(ratings_test)
+# print(predicted_classes)
+
+# predictions = model.predict(documents_train)
+# predicted_classes = np.argmax(predictions, axis=1)
+# print(ratings_train)
+# print(predicted_classes)
+
+# print("Test Loss:", loss)
+# print("Test Accuracy:", accuracy)
+
+# predictions = LSTM_model.predict(documents_test)
+# predicted_classes = np.argmax(predictions, axis=1)
+# print(ratings_test)
+# print(predicted_classes)
+
+number_counts = {}
+for num in ratings:
+    if num in number_counts:
+        number_counts[num] += 1
+    else:
+        number_counts[num] = 1
+
+# Print the counts
+for num, count in number_counts.items():
+    print(f"Number {num} appears {count} times")
