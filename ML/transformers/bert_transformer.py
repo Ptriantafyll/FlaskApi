@@ -89,3 +89,39 @@ print(english_embeddings)
 
 print("Greek embeddings:")
 print(greek_embeddings)
+
+# # Example sentence with a masked word
+# masked_sentence = "I want to [MASK] a new car."
+
+# # Tokenize the masked sentence
+# inputs = tokenizer(masked_sentence, return_tensors="pt",
+#                    padding=True, truncation=True)
+
+# # Predict masked tokens
+# with torch.no_grad():
+#     outputs = model(**inputs)
+#     predictions = outputs.logits
+
+# # Get the predicted token IDs for the masked position
+# masked_position = masked_sentence.split().index("[MASK]")
+# predicted_token_ids = predictions[0, masked_position].topk(k=5).indices
+
+# # Convert token IDs back to words
+# predicted_tokens = tokenizer.convert_ids_to_tokens(predicted_token_ids)
+
+# print("Original Sentence:", masked_sentence)
+# print("Predicted Tokens:", predicted_tokens)
+
+# from transformers import pipeline
+# unmasker = pipeline('fill-mask', model='bert-base-multilingual-uncased')
+# result = unmasker("Hello I'm a [MASK] model.")
+# print(result)
+
+tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-uncased')
+model = BertModel.from_pretrained("bert-base-multilingual-uncased")
+text = "Replace me by any text you'd like."
+encoded_input = tokenizer(text, return_tensors='pt')
+output = model(**encoded_input)
+
+print(encoded_input)
+# print(output)
