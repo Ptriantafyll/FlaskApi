@@ -7,4 +7,6 @@ ft = fasttext.load_model(
 # print(ft.get_dimension())
 # fasttext.util.reduce_model(ft, 100)
 # print(ft.get_dimension())
-ft.get_nearest_neighbors('τρύπα')
+# ft.get_nearest_neighbors('τρύπα')
+print(ft.get_nearest_neighbors("bakery"))
+print(ft.get_word_id("bakery"))
