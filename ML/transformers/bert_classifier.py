@@ -1,7 +1,6 @@
 from transformers import TFBertModel
 import pandas as pd
 import numpy as np
-from tqdm.auto import tqdm
 import tensorflow as tf
 from transformers import BertTokenizer
 import json
@@ -46,8 +45,10 @@ users = json.load(user_file)
 user = users[0]
 
 
-X_input_ids = np.zeros((len(user['links']), 329295))
-X_attn_masks = np.zeros((len(user['links']), 329295))
+# max_length = 329295
+max_length = 512
+X_input_ids = np.zeros((len(user['links']), max_length))
+X_attn_masks = np.zeros((len(user['links']), max_length))
 for i in range(len(user['links'])):
     for url in urls:
         if user['links'][i]["url"] == url["url"]:
@@ -56,7 +57,7 @@ for i in range(len(user['links'])):
             break
     tokenized_text = tokenizer.encode_plus(
         text,
-        max_length=329295,
+        max_length=max_length,
         truncation=True,
         padding='max_length',
         add_special_tokens=True,
@@ -68,23 +69,23 @@ for i in range(len(user['links'])):
 
 user_ratings = []
 for link in user['links']:
-    print(link['rating'])
+    # print(link['rating'])
     user_ratings.append(link['rating'] - 1)
 
 ratings = np.zeros((len(user['links']), 5))
-print(ratings.shape)
+# print(ratings.shape)
 
-print(len(user['links']))
-print(np.array(user_ratings))
+# print(len(user['links']))
+# print(np.array(user_ratings))
 # one-hot encoded target tensor
 ratings[np.arange(len(user['links'])), np.array(user_ratings)] = 1
-print(ratings)
+# print(ratings)
 
 
 # creating a data pipeline using tensorflow dataset utility, creates batches of data for easy loading...
 dataset = tf.data.Dataset.from_tensor_slices(
     (X_input_ids, X_attn_masks, ratings))
-print(dataset.take(1))  # one sample data
+# print(dataset.take(1))  # one sample data
 
 
 def SentimentDatasetMapFunction(input_ids, attn_masks, ratings):
@@ -96,18 +97,18 @@ def SentimentDatasetMapFunction(input_ids, attn_masks, ratings):
 
 # converting to required format for tensorflow dataset
 dataset = dataset.map(SentimentDatasetMapFunction)
-print(dataset.take(1))
+# print(dataset.take(1))
 
 
 # batch size, drop any left out tensor
-dataset = dataset.shuffle(10000).batch(2, drop_remainder=True)
-print(dataset.take(1))
+dataset = dataset.shuffle(10000).batch(4, drop_remainder=True)
+# print(dataset.take(1))
 
 
 p = 0.75
 # for each 16 batch of data we will have len(df)//16 samples, take 80% of that for train.
 train_size = int(len(user['links'])*p)
-print(train_size)
+# print(train_size)
 
 train_dataset = dataset.take(train_size)
 val_dataset = dataset.skip(train_size)
@@ -119,9 +120,9 @@ model = TFBertModel.from_pretrained('bert-base-multilingual-uncased')
 
 # defining 2 input layers for input_ids and attn_masks
 input_ids = tf.keras.layers.Input(
-    shape=(329295,), name='input_ids', dtype='int32')
+    shape=(max_length,), name='input_ids', dtype='int32')
 attn_masks = tf.keras.layers.Input(
-    shape=(329295,), name='attention_mask', dtype='int32')
+    shape=(max_length,), name='attention_mask', dtype='int32')
 
 # 0 -> activation layer (3D), 1 -> pooled output layer (2D)
 bert_embds = model.bert(input_ids, attention_mask=attn_masks)[1]
@@ -130,20 +131,17 @@ intermediate_layer = tf.keras.layers.Dense(
 output_layer = tf.keras.layers.Dense(5, activation='softmax', name='output_layer')(
     intermediate_layer)  # softmax -> calcs probs of classes
 
-sentiment_model = tf.keras.Model(
+rating_model = tf.keras.Model(
     inputs=[input_ids, attn_masks], outputs=output_layer)
-sentiment_model.summary()
+rating_model.summary()
 
-optim = tf.keras.optimizers.Adam()
-loss_func = tf.keras.losses.CategoricalCrossentropy()
-acc = tf.keras.metrics.CategoricalAccuracy('accuracy')
+rating_model.compile(
+    optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-sentiment_model.compile(optimizer=optim, loss=loss_func, metrics=[acc])
-
-hist = sentiment_model.fit(
+rating_model.fit(
     train_dataset,
     validation_data=val_dataset,
-    epochs=2
+    epochs=10
 )
 
-# sentiment_model.save('sentiment_model')
+rating_model.save('rating_model')
