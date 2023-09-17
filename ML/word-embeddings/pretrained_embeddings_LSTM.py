@@ -27,7 +27,7 @@ url_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf-8")
 urls = json.load(url_file)
 
-# Step 1 Preprocess user's ratings
+# Preprocess user's ratings
 ratings = []
 documents = []
 for link in user["links"]:

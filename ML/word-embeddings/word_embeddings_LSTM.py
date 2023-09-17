@@ -27,7 +27,7 @@ def strip_accents_and_lowercase(s):
 
 
 # todo ? cluster of users
-user = users[32]
+user = users[1]
 # user = users[3] #- user with the least # of ratings -> fast model training
 print("User is: ", user["_id"])
 
