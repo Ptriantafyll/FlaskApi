@@ -27,7 +27,7 @@ def strip_accents_and_lowercase(s):
 
 
 # todo ? cluster of users
-user = users[0]
+user = users[32]
 # user = users[3] #- user with the least # of ratings -> fast model training
 print("User is: ", user["_id"])
 
@@ -54,11 +54,10 @@ for link in user["links"]:
     # ? text now has the text of the url
     # print(link['url'], " : ", link["rating"])
     lower_case_text = strip_accents_and_lowercase(text)
-    tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove puunctuation
+    tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove punctuation
     words = tokenizer.tokenize(lower_case_text)
-    words = [word for word in words if word.isalpha()]  # ? remove numbers
     words = [word for word in words if word.isalpha(
-    ) and word not in stop_words and word not in greek_stop_words]
+    ) and word not in stop_words and word not in greek_stop_words]  # ? remove numbers and stopwords
     raw_documents.append(text)
     documents.append(words)
 
@@ -93,7 +92,7 @@ print(word2vec_model.wv.most_similar(positive=w, topn=20))
 
 # Pad sequences
 # max_sequence_length = max(len(seq) for seq in sentence_sequences)
-max_sequence_length = 512
+max_sequence_length = 512  # ? use max length 512
 print("max sequence length: ", max_sequence_length)
 embeddings = pad_sequences(
     sentence_sequences, maxlen=max_sequence_length, padding='post', truncating='post')
@@ -130,17 +129,21 @@ print(embeddings.shape)
 print(embeddings.shape[0])
 print(embeddings.shape[1])
 
+# Input layer
 x_in = Input((max_sequence_length,))
 
+# Embedding layer
 x = Embedding(input_dim=word2vec_model.wv.vectors.shape[0],
               output_dim=word2vec_model.wv.vectors.shape[1],
               weights=[word2vec_model.wv.vectors],
               input_length=max_sequence_length,
               trainable=False)(x_in)
 
-x = LSTM(units=512, dropout=0.2, return_sequences=True)(x)
+# LSTM layer
+# x = LSTM(units=512, dropout=0.2, return_sequences=True)(x)
 x = LSTM(units=512, dropout=0.2)(x)
 
+# Output layer
 x = Dense(64, activation='relu')(x)
 y_out = Dense(5, activation='softmax')(x)
 
