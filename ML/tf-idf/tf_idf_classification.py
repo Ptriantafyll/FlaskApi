@@ -22,10 +22,11 @@ user_file = open(
 users = json.load(user_file)
 
 # todo ? cluster of users
+# ? Pick a user
 user = users[11]
 print("User is: ", user["_id"])
 
-# todo: Step 2: Load and preprocess rated urls of the user
+# ? Load rated urls of the user
 url_file = open(r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json",
                 encoding="utf-8")
 urls = json.load(url_file)
@@ -93,7 +94,7 @@ for link in user["links"]:
 # ? tokenized_documents, rating
 print(ratings)
 
-# TF-IDF Transformation (of the text of the urls)
+# TF-IDF Transformation
 # Load the vectorizer from the file
 with open(r"C:\Users\ptria\source\repos\FlaskApi\ML\tf-idf\tfidf_vectorizer.pkl", 'rb') as f:
     loaded_tfidf_vectorizer = pickle.load(f)
@@ -102,8 +103,6 @@ documents = [" ".join(tokens) for tokens in tokenized_documents]
 documents_tfidf = loaded_tfidf_vectorizer.transform(documents)
 
 # ?logistic regression
-
-
 # LogReg Model Training
 documents_train, documents_test, ratings_train, ratings_test = train_test_split(
     documents_tfidf, ratings, test_size=0.2, random_state=21)
@@ -140,7 +139,7 @@ svm_model = SVC(kernel='rbf')
 #                    tol=0.001, verbose=False)
 svm_model.fit(documents_train, ratings_train)
 
-# Model Evaluation
+# SVM Model Evaluation
 ratings_pred_svm = svm_model.predict(documents_test)
 accuracy_svm = accuracy_score(ratings_test, ratings_pred_svm)
 print("SVM Accuracy:", accuracy_svm)
@@ -164,7 +163,7 @@ print(ratings_train)
 tree_model = DecisionTreeClassifier()
 tree_model.fit(documents_train, ratings_train)
 
-# Model Evaluation
+# Decision Tree Model Evaluation
 ratings_pred_tree = tree_model.predict(documents_test)
 accuracy_tree = accuracy_score(ratings_test, ratings_pred_tree)
 print("Decision Tree Accuracy:", accuracy_tree)
