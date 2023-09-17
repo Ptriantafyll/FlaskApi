@@ -88,7 +88,3 @@ for row, col in zip(*non_zero_indices):
 # Save the vectorizer to a file
 with open(r"C:\Users\ptria\source\repos\FlaskApi\ML\tf-idf\tfidf_vectorizer.pkl", 'wb') as f:
     pickle.dump(tfidf_vectorizer, f)
-
-# Load the vectorizer from the file
-# with open('tfidf_vectorizer.pkl', 'rb') as f:
-#     loaded_tfidf_vectorizer = pickle.load(f)
