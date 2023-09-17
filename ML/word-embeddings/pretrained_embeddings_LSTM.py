@@ -73,8 +73,10 @@ embedding_matrix = np.zeros((vocab_size, embedding_dimension))
 for word, idx in tokenizer.word_index.items():
     embedding_matrix[idx] = ft.get_word_vector(word)
 
+# Input Layer
 x_in = Input((max_sequence_length,))
 
+# Embedding layer
 x = Embedding(
     input_dim=vocab_size,
     output_dim=embedding_dimension,
@@ -82,9 +84,11 @@ x = Embedding(
     input_length=max_sequence_length,
     trainable=False)(x_in)
 
-x = LSTM(units=512, dropout=0.2, return_sequences=True)(x)
+# LSTM layer
+# x = LSTM(units=512, dropout=0.2, return_sequences=True)(x)
 x = LSTM(units=512, dropout=0.2)(x)
 
+# Output layer
 x = Dense(64, activation='relu')(x)
 y_out = Dense(5, activation='softmax')(x)
 
