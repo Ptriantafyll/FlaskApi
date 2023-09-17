@@ -102,7 +102,7 @@ print(documents_test.shape)
 print(ratings_train.shape)
 print(ratings_test.shape)
 LSTM_model.fit(documents_train, ratings_train,  validation_data=(
-    documents_test, ratings_test), epochs=10, batch_size=16)
+    documents_test, ratings_test), epochs=10, batch_size=32)
 
 # Evaluate the model on the test data
 loss, accuracy = LSTM_model.evaluate(
