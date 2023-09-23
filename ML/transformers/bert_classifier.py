@@ -88,7 +88,7 @@ dataset = tf.data.Dataset.from_tensor_slices(
 # print(dataset.take(1))  # one sample data
 
 
-def SentimentDatasetMapFunction(input_ids, attn_masks, ratings):
+def RatingDatasetMapFunction(input_ids, attn_masks, ratings):
     return {
         'input_ids': input_ids,
         'attention_mask': attn_masks
@@ -96,7 +96,7 @@ def SentimentDatasetMapFunction(input_ids, attn_masks, ratings):
 
 
 # converting to required format for tensorflow dataset
-dataset = dataset.map(SentimentDatasetMapFunction)
+dataset = dataset.map(RatingDatasetMapFunction)
 # print(dataset.take(1))
 
 
@@ -136,7 +136,7 @@ rating_model = tf.keras.Model(
 rating_model.summary()
 
 rating_model.compile(
-    optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+    optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 rating_model.fit(
     train_dataset,
