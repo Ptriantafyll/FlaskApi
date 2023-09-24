@@ -20,3 +20,9 @@ In the `fasttext_pretrained_embeddings.py` file. A pretrained fasttext model is 
 
 Instructions for setting up the fasttext module are [here](https://fasttext.cc/docs/en/support.html#building-fasttext-python-module)
 Instructions for downloading and using the model are [here](https://fasttext.cc/docs/en/crawl-vectors.html) 
+
+## Transformers
+
+## Bert
+<!-- todo explain more -->
+The `bert-base-multilingual-uncased` pre-trained model is used.
