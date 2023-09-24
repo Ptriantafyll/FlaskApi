@@ -111,13 +111,15 @@ lstm_layer = LSTM(units=512, dropout=0.2)(embedding_layer)
 
 # Output layer
 intermediate_layer = Dense(64, activation='relu')(lstm_layer)
-y_out = Dense(5, activation='softmax')(intermediate_layer)
+output_layer = Dense(5, activation='softmax')(intermediate_layer)
 
-LSTM_model = Model(inputs=input_layer, outputs=y_out)
+# Create lstm model
+LSTM_model = Model(inputs=input_layer, outputs=output_layer)
 LSTM_model.compile(loss='sparse_categorical_crossentropy',
                    optimizer='adam', metrics=['accuracy'])
 
-LSTM_model.summary()
+LSTM_model.summary()  # Print model
+# Train model
 LSTM_model.fit(documents_train, ratings_train,  validation_data=(
     documents_test, ratings_test), epochs=10, batch_size=32)
 
