@@ -7,11 +7,7 @@ import json
 import logging
 import unicodedata
 from nltk.tokenize import RegexpTokenizer
-
-
-def strip_accents_and_lowercase(s):
-    return ''.join(c for c in unicodedata.normalize('NFD', s)
-                   if unicodedata.category(c) != 'Mn').lower()
+from functions import normalize
 
 
 def preprocess_document(doc):
@@ -21,16 +17,13 @@ def preprocess_document(doc):
     greek_stop_words = json.load(greek_stop_words_file)
 
     tokenizer = RegexpTokenizer(r'\w+')  # ? tokenizes and removes puunctuation
-    lower_case_text = strip_accents_and_lowercase(doc)
+    lower_case_text = normalize.strip_accents_and_lowercase(doc)
 
     tokens = tokenizer.tokenize(lower_case_text)
 
-    # ?Remove punctuation and stopwords
+    # ? Remove punctuation and stopwords
     filtered_tokens = [token for token in tokens if token.isalpha(
     ) and token not in stop_words and token not in greek_stop_words]
-
-    # ? remove numbers
-    # filtered_tokens = [word for word in filtered_tokens if word.isalpha()]
 
     return filtered_tokens
 
@@ -38,15 +31,12 @@ def preprocess_document(doc):
 logging.basicConfig(
     format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-# ? gensim word embeddings
+# ? File that contains all the users in the mongodb cluster
 url_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf8")
 urls = json.load(url_file)
 
 documents = [preprocess_document(url['text']) for url in urls]
-
-# for i in range(2):
-# print(documents[i])
 
 # Train the Word2Vec model
 model = Word2Vec(sentences=documents, vector_size=100,
