@@ -10,23 +10,25 @@ import spacy
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
+from functions import normalize
 
 # ? you need the following 3 lines only the first time you run this file
 # import nltk
 # nltk.download("stopwords")
 # nltk.download("punkt")
 
-
+# ? File that contains all the users in the mongodb cluster
 user_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\users.json", encoding="utf8")
 users = json.load(user_file)
+
 
 # todo ? cluster of users
 # ? Pick a user
 user = users[11]
 print("User is: ", user["_id"])
 
-# ? Load rated urls of the user
+# ? File that contains all the users in the mongodb cluster
 url_file = open(r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json",
                 encoding="utf-8")
 urls = json.load(url_file)
@@ -35,12 +37,8 @@ urls = json.load(url_file)
 greek_stop_words_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\greek_stop_words.json", encoding="utf8")
 greek_stop_words = json.load(greek_stop_words_file)
-stop_words = set(stopwords.words('english'))  # take english stopwords
-
-# for link in user["links"]:
-# print(link)
-print(user["links"][0]["url"])
-print(urls[0]["url"])
+# take english stopwords from nltk
+stop_words = set(stopwords.words('english'))
 
 nlp_greek = spacy.load("el_core_news_sm")
 nlp_english = spacy.load("en_core_web_sm")
@@ -54,45 +52,31 @@ for link in user["links"]:
     for url in urls:
         if link["url"] == url["url"]:
             text = url["text"]
-            language = url["language"]
             break
-
     # ? text now has the text of the url
-    # print(link['url'], " : ", link["rating"])
 
-    lower_case_text = text.lower()  # ? make text lowercase
+    lower_case_text = normalize.strip_accents_and_lowercase(text)
     tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove punctuation
     words = tokenizer.tokenize(lower_case_text)
     words = [word for word in words if word.isalpha()]  # ? remove numbers
-
-    # print(words)
 
     # ? remove english and greek stop words
     filtered_words = [
         w for w in words if not w in stop_words and not w in greek_stop_words and len(w) > 1]
     words.append(filtered_words)
 
-    if 'en' in language:
-        # print("stemming english")
+    # ? If the document is in english use stemming
+    if 'en' in url["language"]:
         ps = PorterStemmer()
         stemmed_words = [ps.stem(word) for word in filtered_words]
         tokenized_documents.append(stemmed_words)
-        # print(stemmed_words)
 
-    if 'el' in language:
-        # print("lemmatizing greek")
+    # ? If the document is in greek use lemmatizing
+    if 'el' in url["language"]:
         lemmatized_words = []
         lemmatized_words = [nlp_english(token)[0].lemma_ if token.isascii(
         ) else nlp_greek(token)[0].lemma_ for token in filtered_words]
         tokenized_documents.append(lemmatized_words)
-        # print(lemmatized_words)
-
-
-# for doc in tokenized_documents:
-#     print(doc)
-
-# ? tokenized_documents, rating
-print(ratings)
 
 # TF-IDF Transformation
 # Load the vectorizer from the file
@@ -102,14 +86,13 @@ with open(r"C:\Users\ptria\source\repos\FlaskApi\ML\tf-idf\tfidf_vectorizer.pkl"
 documents = [" ".join(tokens) for tokens in tokenized_documents]
 documents_tfidf = loaded_tfidf_vectorizer.transform(documents)
 
-# ?logistic regression
-# LogReg Model Training
+# Split data into training-testing
 documents_train, documents_test, ratings_train, ratings_test = train_test_split(
     documents_tfidf, ratings, test_size=0.2, random_state=21)
 
+# Logistic Regression Model Training
 logreg_model = LogisticRegression(max_iter=2000)
 logreg_model.fit(documents_train, ratings_train)
-
 
 # LogReg Model Evaluation
 ratings_pred = logreg_model.predict(documents_test)
@@ -128,8 +111,6 @@ print("R2 Score:", r2)
 print(ratings_pred)
 print(ratings_test)
 print(ratings_train)
-
-# ?SVM classifier
 
 # SVM Model Training
 svm_model = SVC(kernel='rbf')
