@@ -1,24 +1,16 @@
 import json
 import spacy
 import pickle
-import numpy as np
-import unicodedata
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
+from functions import normalize
 
 # ? File that contains all the urls in the mongodb cluster
 url_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf8")
 urls = json.load(url_file)
-
-
-def strip_accents_and_lowercase(s):
-    # ? Fuction that removes punctuation (needed in greek) and lowers text
-    return ''.join(c for c in unicodedata.normalize('NFD', s)
-                   if unicodedata.category(c) != 'Mn').lower()
-
 
 # ? The following lines are needed only the first time you run the code
 # import nltk
@@ -37,7 +29,7 @@ tokenized_documents = []
 for i in range(len(urls)):
     text = urls[i]['text']
 
-    lower_case_text = strip_accents_and_lowercase(text)
+    lower_case_text = normalize.strip_accents_and_lowercase(text)
     tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove punctuation
     words = tokenizer.tokenize(lower_case_text)
     words = [word for word in words if word.isalpha()]  # ? remove numbers

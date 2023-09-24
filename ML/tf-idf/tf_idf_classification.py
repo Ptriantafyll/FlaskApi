@@ -10,7 +10,7 @@ import spacy
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-import unicodedata
+from functions import normalize
 
 # ? you need the following 3 lines only the first time you run this file
 # import nltk
@@ -21,12 +21,6 @@ import unicodedata
 user_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\users.json", encoding="utf8")
 users = json.load(user_file)
-
-
-def strip_accents_and_lowercase(s):
-    # ? Fuction that removes punctuation (needed in greek) and lowers text
-    return ''.join(c for c in unicodedata.normalize('NFD', s)
-                   if unicodedata.category(c) != 'Mn').lower()
 
 
 # todo ? cluster of users
@@ -61,7 +55,7 @@ for link in user["links"]:
             break
     # ? text now has the text of the url
 
-    lower_case_text = strip_accents_and_lowercase(text)
+    lower_case_text = normalize.strip_accents_and_lowercase(text)
     tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove punctuation
     words = tokenizer.tokenize(lower_case_text)
     words = [word for word in words if word.isalpha()]  # ? remove numbers
