@@ -8,7 +8,6 @@ from keras.models import Model
 from gensim.models import Word2Vec
 import json
 import numpy as np
-import unicodedata
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from functions import normalize
