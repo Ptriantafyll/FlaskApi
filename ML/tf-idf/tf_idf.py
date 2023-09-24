@@ -1,6 +1,5 @@
 import json
 import spacy
-import nltk
 import pickle
 import numpy as np
 import unicodedata
@@ -9,38 +8,39 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+# ? File that contains all the urls in the mongodb cluster
 url_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf8")
 urls = json.load(url_file)
 
 
 def strip_accents_and_lowercase(s):
+    # ? Fuction that removes punctuation (needed in greek) and lowers text
     return ''.join(c for c in unicodedata.normalize('NFD', s)
                    if unicodedata.category(c) != 'Mn').lower()
 
 
+# ? The following lines are needed only the first time you run the code
+# import nltk
 # nltk.download('stopwords')
+
 nlp_greek = spacy.load("el_core_news_sm")
 nlp_english = spacy.load("en_core_web_sm")
 
+# ? File that contains the greek stopwords
 greek_stop_words_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\greek_stop_words.json", encoding="utf8")
 greek_stop_words = json.load(greek_stop_words_file)
 
-print(len(urls))
-
+# ? Bag of words tokenizing
 tokenized_documents = []
 for i in range(len(urls)):
     text = urls[i]['text']
-    print(urls[i]['url'], " : ", urls[i]['language'])
 
-    # lower_case_text = text.lower()  # ? make text lowercase
     lower_case_text = strip_accents_and_lowercase(text)
-    tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove puunctuation
+    tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove punctuation
     words = tokenizer.tokenize(lower_case_text)
     words = [word for word in words if word.isalpha()]  # ? remove numbers
-
-    # print(words)
 
     # ? remove english and greek stop words
     stop_words = set(stopwords.words('english'))
@@ -48,41 +48,34 @@ for i in range(len(urls)):
         w for w in words if not w in stop_words and not w in greek_stop_words and len(w) > 1]
     words.append(filtered_words)
 
+    # ? If the document is in english use stemming
     if 'en' in urls[i]['language']:
-        # print("stemming english")
         ps = PorterStemmer()
         stemmed_words = [ps.stem(word) for word in filtered_words]
         tokenized_documents.append(stemmed_words)
-        # print(stemmed_words)
 
+    # ? If the document is in greek use lemmatizing
     if 'el' in urls[i]['language']:
-        # print("lemmatizing greek")
         lemmatized_words = []
         lemmatized_words = [nlp_english(token)[0].lemma_ if token.isascii(
         ) else nlp_greek(token)[0].lemma_ for token in filtered_words]
         tokenized_documents.append(lemmatized_words)
-        # print(lemmatized_words)
-
-# for doc in tokenized_documents:
-#   print(doc)
 
 
-# CREATE TF IDF VECTORIZER
 documents = [" ".join(tokens) for tokens in tokenized_documents]
 
+# ? Create tf-idf vectorizer and fit on documents
 tfidf_vectorizer = TfidfVectorizer()
 tfidf_vectors = tfidf_vectorizer.fit_transform(documents)
 tfidf_vectors = tfidf_vectors.toarray()
-feature_names = tfidf_vectorizer.get_feature_names_out()
 
-# for vector in tfidf_vectors:
-#   print(vector)
 
 # ? print nonzero values
-non_zero_indices = np.nonzero(tfidf_vectors)
-for row, col in zip(*non_zero_indices):
-    print(
-        f"Document {row}, Term '{feature_names[col]}': {tfidf_vectors[row, col]}")
+# feature_names = tfidf_vectorizer.get_feature_names_out()
+# non_zero_indices = np.nonzero(tfidf_vectors)
+# for row, col in zip(*non_zero_indices):
+#     print(
+#         f"Document {row}, Term '{feature_names[col]}': {tfidf_vectors[row, col]}")
 
 
 # Save the vectorizer to a file
