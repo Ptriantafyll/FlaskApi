@@ -22,8 +22,6 @@ user_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\users.json", encoding="utf8")
 users = json.load(user_file)
 
-
-# todo ? cluster of users
 # ? Pick a user
 user = users[11]
 print("User is: ", user["_id"])
