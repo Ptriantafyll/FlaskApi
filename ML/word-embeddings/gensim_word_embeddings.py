@@ -31,7 +31,7 @@ def preprocess_document(doc):
 logging.basicConfig(
     format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-# ? File that contains all the users in the mongodb cluster
+# ? File that contains all the urls in the mongodb cluster
 url_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf8")
 urls = json.load(url_file)
