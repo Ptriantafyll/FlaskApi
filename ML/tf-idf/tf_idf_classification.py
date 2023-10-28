@@ -26,7 +26,7 @@ users = json.load(user_file)
 user = users[11]
 print("User is: ", user["_id"])
 
-# ? File that contains all the users in the mongodb cluster
+# ? File that contains all the urls in the mongodb cluster
 url_file = open(r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json",
                 encoding="utf-8")
 urls = json.load(url_file)
