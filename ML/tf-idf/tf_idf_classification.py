@@ -22,14 +22,15 @@ user_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\users.json", encoding="utf8")
 users = json.load(user_file)
 
-# ? Pick a user
-user = users[11]
-print("User is: ", user["_id"])
-
 # ? File that contains all the urls in the mongodb cluster
 url_file = open(r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json",
                 encoding="utf-8")
 urls = json.load(url_file)
+
+# ? Pick a user
+user = users[11]
+print("User is: ", user["_id"])
+
 
 # ? take greek stop words from file
 greek_stop_words_file = open(
@@ -46,7 +47,7 @@ ratings = []
 tokenized_documents = []
 for link in user["links"]:
     ratings.append(link["rating"])
-    # ? check if the url exists to get the text, otherwise use selenium?
+    # ? check if the url exists to get the text
     for url in urls:
         if link["url"] == url["url"]:
             text = url["text"]
