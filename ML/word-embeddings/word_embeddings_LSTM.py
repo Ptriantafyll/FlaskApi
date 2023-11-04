@@ -10,6 +10,10 @@ import json
 import numpy as np
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
+
+# This is needed to import a function from different directory
+import sys
+sys.path.append(r"C:\Users\ptria\source\repos\FlaskApi\ML")
 from functions import normalize
 
 # ? load word2vec model from file
@@ -103,7 +107,7 @@ embedding_layer = Embedding(input_dim=word2vec_model.wv.vectors.shape[0],
                             output_dim=word2vec_model.wv.vectors.shape[1],
                             weights=[word2vec_model.wv.vectors],
                             input_length=max_sequence_length,
-                            trainable=False, name="word2vec embeddings")(input_layer)
+                            trainable=False, name="word2vec_embeddings")(input_layer)
 
 # LSTM layer
 # x = LSTM(units=512, dropout=0.2, return_sequences=True)(x)
