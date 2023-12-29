@@ -23,8 +23,10 @@ user = users[1]
 # user = users[3]  # - user with the least # of ratings -> fast model training
 
 # ? File that contains all the urls in the mongodb cluster
+# url_file = open(
+#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf-8")
 url_file = open(
-    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf-8")
+    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls_without_errors.json", encoding="utf-8")
 urls = json.load(url_file)
 
 # Preprocess user's ratings
