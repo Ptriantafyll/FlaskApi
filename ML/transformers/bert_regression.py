@@ -20,14 +20,13 @@ import matrix_factorization
 
 # Returns user-url matrix as pandas DataFrame 
 df = matrix_factorization.perform_martix_factorization()
+# pick a user from pandas df
+user = df.index[1]
 
 # ? File that contains all the urls in the mongodb cluster
 url_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf-8")
 urls = json.load(url_file)
-
-# pick a user from pandas df
-user = df.index[1]
 
 # ? Load pretrained tokenizer
 tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")

@@ -22,21 +22,12 @@ import matrix_factorization
 # Returns user-url matrix as pandas DataFrame 
 df = matrix_factorization.perform_martix_factorization()
 
-# ? File that contains all the users in the mongodb cluster
-# user_file = open(
-#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\users.json")
-# users = json.load(user_file)
-
-# ? File that contains all the urls in the mongodb cluster
-# url_file = open(
-#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf-8")
 url_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls_without_errors.json", encoding="utf-8")
 urls = json.load(url_file)
 
 # pick a user from pandas df
-# user = df.index[0]
-user = df.index[11]
+user = df.index[1]
 
 # Preprocess user's ratings
 ratings = []
@@ -44,10 +35,7 @@ documents = []
 counter = 0
 for url in df.columns:
     ratings.append(df.loc[user,url])
-    # print(url)
-    # print(df.loc[user,url])
     counter = counter + 1
-    print(counter)
 
     # ? check if the url exists to get the text
     for link in urls:
@@ -87,7 +75,7 @@ ratings_test = np.array(ratings_test)
 vocab_size = len(tokenizer.word_index) + 1  # +1 for the reserved padding index
 print(vocab_size)
 
-# You can reduce dimension from 300 to 100
+# You can reduce dimension from 300 to 100 for faster model
 # fasttext.util.reduce_model(ft, 100)
 # Create matrix with fasttext embeddings
 embedding_dimension = ft.get_dimension()
@@ -107,7 +95,6 @@ embedding_layer = Embedding(
     trainable=False)(input_layer)
 
 # LSTM layer
-# x = LSTM(units=512, dropout=0.2, return_sequences=True)(x)
 lstm_layer = LSTM(units=512, dropout=0.2)(embedding_layer)
 
 # Output layer
@@ -128,19 +115,11 @@ LSTM_model.fit(documents_train, ratings_train,  validation_data=(
 loss, accuracy = LSTM_model.evaluate(
     documents_test, ratings_test)
 
-# Print the evaluation results
-print("Test Loss:", loss)
-print("Test Accuracy:", accuracy)
-
 predictions = LSTM_model.predict(documents_test)
 predicted_classes = np.argmax(predictions, axis=1)
-print(ratings_test)
-print(predicted_classes)
 
 # Compute the confusion matrix
 cm = confusion_matrix(ratings_test, predicted_classes)
-print(cm)
-
 # Display the confusion matrix using seaborn for better visualization
 plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
@@ -149,18 +128,14 @@ plt.ylabel('True')
 plt.title('Confusion Matrix')
 plt.show()
 
-# predictions = LSTM_model.predict(documents_train)
-# predicted_classes = np.argmax(predictions, axis=1)
-# print(ratings_train)
-# print(predicted_classes)
+predictions = LSTM_model.predict(documents_train)
+predicted_classes = np.argmax(predictions, axis=1)
 
-# cm = confusion_matrix(ratings_train, predicted_classes)
-# print(cm)
-
-# # Display the confusion matrix using seaborn for better visualization
-# plt.figure(figsize=(8, 6))
-# sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
-# plt.xlabel('Predicted')
-# plt.ylabel('True')
-# plt.title('Confusion Matrix')
-# plt.show()
+cm = confusion_matrix(ratings_train, predicted_classes)
+# Display the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.title('Confusion Matrix')
+plt.show()

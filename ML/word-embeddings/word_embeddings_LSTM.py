@@ -30,20 +30,16 @@ users = json.load(user_file)
 # import nltk
 # nltk.download('stopwords')
 
-# todo ? cluster of users
+# Pick a user
 user = users[1]
-# user = users[3] #- user with the least # of ratings -> fast model training
 
 # ? File that contains all the urls in the mongodb cluster
-# url_file = open(
-#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf-8")
 url_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls_without_errors.json", encoding="utf-8")
 urls = json.load(url_file)
 
 ratings = []
 documents = []
-raw_documents = []
 # take english stopwords from nltk
 stop_words = set(stopwords.words('english'))
 # ? File that contains the greek stopwords
@@ -65,7 +61,6 @@ for link in user["links"]:
     words = tokenizer.tokenize(lower_case_text)
     words = [word for word in words if word.isalpha(
     ) and word not in stop_words and word not in greek_stop_words]  # ? remove numbers and stopwords
-    raw_documents.append(text)
     documents.append(words)
 
 
@@ -113,7 +108,6 @@ embedding_layer = Embedding(input_dim=word2vec_model.wv.vectors.shape[0],
                             trainable=False, name="word2vec_embeddings")(input_layer)
 
 # LSTM layer
-# x = LSTM(units=512, dropout=0.2, return_sequences=True)(x)
 lstm_layer = LSTM(units=512, dropout=0.2)(embedding_layer)
 
 # Output layer
@@ -132,44 +126,28 @@ LSTM_model.summary()  # Print model
 LSTM_model.fit(documents_train, ratings_train,  validation_data=(
     documents_test, ratings_test), epochs=10, batch_size=32)
 
-# # Evaluate the model on the test data
-# loss, accuracy = LSTM_model.evaluate(
-#     documents_test, ratings_test)
 
-# # Print the evaluation results
-# print("Test Loss:", loss)
-# print("Test Accuracy:", accuracy)
+predictions = LSTM_model.predict(documents_test)
+predicted_classes = np.argmax(predictions, axis=1)
 
-# predictions = LSTM_model.predict(documents_test)
-# predicted_classes = np.argmax(predictions, axis=1)
-# print(ratings_test)
-# print(predicted_classes)
+# Compute the confusion matrix
+cm = confusion_matrix(ratings_test, predicted_classes)
+# Display the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.title('Confusion Matrix')
+plt.show()
 
-# # Compute the confusion matrix
-# cm = confusion_matrix(ratings_test, predicted_classes)
-# print(cm)
+predictions = LSTM_model.predict(documents_train)
+predicted_classes = np.argmax(predictions, axis=1)
 
-# # Display the confusion matrix using seaborn for better visualization
-# plt.figure(figsize=(8, 6))
-# sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
-# plt.xlabel('Predicted')
-# plt.ylabel('True')
-# plt.title('Confusion Matrix')
-# plt.show()
-
-# predictions = LSTM_model.predict(documents_train)
-# predicted_classes = np.argmax(predictions, axis=1)
-# print(ratings_train)
-# print(predicted_classes)
-
-# cm = confusion_matrix(ratings_train, predicted_classes)
-# print(cm)
-
-
-# # Display the confusion matrix using seaborn for better visualization
-# plt.figure(figsize=(8, 6))
-# sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
-# plt.xlabel('Predicted')
-# plt.ylabel('True')
-# plt.title('Confusion Matrix')
-# plt.show()
+cm = confusion_matrix(ratings_train, predicted_classes)
+# Display the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.title('Confusion Matrix')
+plt.show()

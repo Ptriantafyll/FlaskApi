@@ -27,18 +27,7 @@ import matrix_factorization
 # nltk.download("stopwords")
 # nltk.download("punkt")
 
-# df = pd.read_csv(
-#     r"C:\Users\ptria\source\repos\FlaskApi\ML\user_url_matrix_new.csv")
-# Returns user-url matrix as pandas DataFrame 
 df = matrix_factorization.perform_martix_factorization()
-
-print(df.head())
-print(df.index[1]) # this prints a user id
-
-# # ? File that contains all the users in the mongodb cluster
-# user_file = open(
-#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\users.json", encoding="utf8")
-# users = json.load(user_file)
 
 # ? File that contains all the urls in the mongodb cluster
 url_file = open(r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json",
@@ -64,10 +53,7 @@ tokenized_documents = []
 not_found =[]
 counter = 0
 for url in df.columns:
-    # print(url)
-    # print(df.loc[user,url])
     counter = counter + 1
-    print(counter)
 
     # ? check if the url exists to get the text
     for link in urls:
@@ -104,7 +90,6 @@ for url in df.columns:
         print(url, " ", url_language)
         not_found.append(url)
 
-print("not found: ", not_found)
 
 # TF-IDF Transformation
 # Load the vectorizer from the file
@@ -136,18 +121,8 @@ print("F1 Score:", f1)
 r2 = r2_score(ratings_test, ratings_pred)
 print("R2 Score:", r2)
 
-print(ratings_pred)
-print(ratings_test)
-print(ratings_train)
-
-print(len(ratings_pred))
-print(len(ratings_test))
-print(len(ratings_train))
-
 # Compute the confusion matrix
 cm = confusion_matrix(ratings_test, ratings_pred)
-print(cm)
-
 # Display the confusion matrix using seaborn for better visualization
 plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
@@ -179,14 +154,8 @@ print("F1 Score:", f1)
 r2 = r2_score(ratings_test, ratings_pred)
 print("R2 Score:", r2)
 
-print(ratings_pred_svm)
-print(ratings_test)
-print(ratings_train)
-
 # Compute the confusion matrix
 cm = confusion_matrix(ratings_test, ratings_pred)
-print(cm)
-
 # Display the confusion matrix using seaborn for better visualization
 plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
@@ -215,14 +184,8 @@ print("F1 Score:", f1)
 r2 = r2_score(ratings_test, ratings_pred)
 print("R2 Score:", r2)
 
-print(ratings_pred_tree)
-print(ratings_test)
-print(ratings_train)
-
 # Compute the confusion matrix
 cm = confusion_matrix(ratings_test, ratings_pred)
-print(cm)
-
 # Display the confusion matrix using seaborn for better visualization
 plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
