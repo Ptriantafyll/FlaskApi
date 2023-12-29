@@ -13,3 +13,5 @@ Web-Scraping/mongo*
 *.bin*
 *.vec*
 *test*
+*rating_model*
+*images*
