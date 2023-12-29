@@ -11,8 +11,11 @@ import json
 tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-uncased')
 
 # ? File that contains all the urls in the mongodb cluster
+# url_file = open(
+#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf8")
+# urls = json.load(url_file)
 url_file = open(
-    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf8")
+    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls_without_errors.json", encoding="utf8")
 urls = json.load(url_file)
 
 
@@ -134,13 +137,17 @@ output_layer = tf.keras.layers.Dense(5, activation='softmax', name='output_layer
 # Create model
 rating_model = tf.keras.Model(
     inputs=[input_ids, attn_masks], outputs=output_layer)
+
+for layer in rating_model.layers[:3]:
+    layer.trainable = False
+
 # Print model
 rating_model.summary()
 # Train model
 rating_model.compile(
     optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-rating_model.fit(
+history = rating_model.fit(
     train_dataset,
     validation_data=test_dataset,
     epochs=10
@@ -148,44 +155,3 @@ rating_model.fit(
 
 # Save model
 rating_model.save('rating_model')
-
-# # Evaluate the model on the test data
-# loss, accuracy = LSTM_model.evaluate(
-#     documents_test, ratings_test)
-
-# # Print the evaluation results
-# print("Test Loss:", loss)
-# print("Test Accuracy:", accuracy)
-
-# predictions = LSTM_model.predict(documents_test)
-# predicted_classes = np.argmax(predictions, axis=1)
-# print(ratings_test)
-# print(predicted_classes)
-
-# # Compute the confusion matrix
-# cm = confusion_matrix(ratings_test, predicted_classes)
-# print(cm)
-
-# # Display the confusion matrix using seaborn for better visualization
-# plt.figure(figsize=(8, 6))
-# sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
-# plt.xlabel('Predicted')
-# plt.ylabel('True')
-# plt.title('Confusion Matrix')
-# plt.show()
-
-# predictions = LSTM_model.predict(documents_train)
-# predicted_classes = np.argmax(predictions, axis=1)
-# print(ratings_train)
-# print(predicted_classes)
-
-# cm = confusion_matrix(ratings_train, predicted_classes)
-# print(cm)
-
-# # Display the confusion matrix using seaborn for better visualization
-# plt.figure(figsize=(8, 6))
-# sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
-# plt.xlabel('Predicted')
-# plt.ylabel('True')
-# plt.title('Confusion Matrix')
-# plt.show()
