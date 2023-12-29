@@ -12,6 +12,7 @@ import numpy as np
 import tensorflow as tf
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
+from sklearn.utils.class_weight import compute_class_weight
 
 # This is needed to import a function from different directory
 import sys
@@ -79,7 +80,7 @@ for sentence in documents:
 # Pad sequences
 # max_sequence_length = max(len(seq) for seq in sentence_sequences)
 # ? use max length 512 instead of the max length of all sequences
-max_sequence_length = 512
+max_sequence_length = 128
 print("max sequence length: ", max_sequence_length)
 
 # ? Word2Vec model embeddings
@@ -89,17 +90,26 @@ embeddings = pad_sequences(
 # Get the vocabulary as a set
 vocabulary = list(word2vec_model.wv.index_to_key)
 
-# Split data into train-test
+# Train-val
+documents_train, documents_val, ratings_train, ratings_val = train_test_split(
+    embeddings, ratings, test_size=0.2, random_state=42)
+
+# Train-test
 documents_train, documents_test, ratings_train, ratings_test = train_test_split(
     embeddings, ratings, test_size=0.2, random_state=42)
 
 # Make ratings 0-4 instead of 1-5
 ratings_train = [rating - 1 for rating in ratings_train]
+ratings_val = [rating - 1 for rating in ratings_val]
 ratings_test = [rating - 1 for rating in ratings_test]
 
 # Convert ratings into the required format
 ratings_train = np.array(ratings_train)
+ratings_val = np.array(ratings_val)
 ratings_test = np.array(ratings_test)
+
+class_weights = compute_class_weight('balanced', classes=np.unique(ratings_train), y=ratings_train)
+class_weights_dict = dict(enumerate(class_weights))
 
 # Input layer
 input_layer = Input((max_sequence_length,), name="input layer")
@@ -112,46 +122,77 @@ embedding_layer = Embedding(input_dim=word2vec_model.wv.vectors.shape[0],
                             trainable=False, name="word2vec_embeddings")(input_layer)
 
 # LSTM layer
-lstm_layer = LSTM(units=512, dropout=0.2)(embedding_layer)
-dropout_layer = Dropout(0.2)(lstm_layer)
+lstm_layer = LSTM(units=512, dropout=0.5)(embedding_layer)
 
 # Output layer
-intermediate_layer = Dense(64, activation='relu')(dropout_layer)
-dropout_layer = Dropout(0.2)(intermediate_layer)
-output_layer = Dense(5, activation='softmax')(dropout_layer)
+intermediate_layer = Dense(64, activation='relu')(lstm_layer)
+output_layer = Dense(1, activation='linear')(intermediate_layer)
 
 # Create lstm model
 LSTM_model = Model(inputs=input_layer, outputs=output_layer)
-LSTM_model.compile(loss='sparse_categorical_crossentropy',
-                   optimizer='adam', metrics=['accuracy'])
+optimizer = tf.keras.optimizers.Adam(learning_rate = 1e-4)
+LSTM_model.compile(optimizer=optimizer, loss='mean_squared_error', metrics=['mae'])
 
 LSTM_model.summary()  # Print model
 # Train model
-LSTM_model.fit(documents_train, ratings_train,  validation_data=(
-    documents_test, ratings_test), epochs=20, batch_size=32)
+history = LSTM_model.fit(documents_train, ratings_train,  validation_data=(
+    documents_val, ratings_val), epochs=100, batch_size=32, class_weight=class_weights_dict)
 
 
-predictions = LSTM_model.predict(documents_test)
-predicted_classes = np.argmax(predictions, axis=1)
+# Plot training and validation loss
+plt.plot(history.history['loss'], label='Train Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Mean Squared Error')
+plt.savefig(r"C:\Users\ptria\source\repos\FlaskApi\images\word2vec\mse.png")
+plt.legend()
+plt.show()
 
+# Plot training and validation MAE
+plt.plot(history.history['mae'], label='Train MAE')
+plt.plot(history.history['val_mae'], label='Validation MAE')
+plt.xlabel('Epoch')
+plt.ylabel('Mean Absolute Error')
+plt.legend()
+plt.savefig(r"C:\Users\ptria\source\repos\FlaskApi\images\word2vec\mae.png")
+plt.show()
+
+
+predictions = LSTM_model.predict(documents_val)
+predicted_ratings = [max(0, min(round(x),4)) for x in predictions.flatten()]
 # Compute the confusion matrix
-cm = confusion_matrix(ratings_test, predicted_classes)
+cm = confusion_matrix(ratings_val, predicted_ratings)
 # Display the confusion matrix using seaborn for better visualization
 plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
 plt.xlabel('Predicted')
 plt.ylabel('True')
 plt.title('Confusion Matrix')
+plt.savefig(r"C:\Users\ptria\source\repos\FlaskApi\images\word2vec\val_cm.png")
 plt.show()
 
 predictions = LSTM_model.predict(documents_train)
-predicted_classes = np.argmax(predictions, axis=1)
+predicted_ratings = [max(0, min(round(x),4)) for x in predictions.flatten()]
 
-cm = confusion_matrix(ratings_train, predicted_classes)
+cm = confusion_matrix(ratings_train, predicted_ratings)
 # Display the confusion matrix using seaborn for better visualization
 plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
 plt.xlabel('Predicted')
 plt.ylabel('True')
 plt.title('Confusion Matrix')
+plt.savefig(r"C:\Users\ptria\source\repos\FlaskApi\images\word2vec\train_cm.png")
+plt.show()
+
+predictions = LSTM_model.predict(documents_test)
+predicted_ratings = [max(0, min(round(x),4)) for x in predictions.flatten()]
+# Compute the confusion matrix
+cm = confusion_matrix(ratings_test, predicted_ratings)
+# Display the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.title('Confusion Matrix')
+plt.savefig(r"C:\Users\ptria\source\repos\FlaskApi\images\word2vec\test_cm.png")
 plt.show()
