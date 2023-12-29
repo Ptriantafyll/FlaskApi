@@ -9,7 +9,7 @@ ML/*/mongo*
 Web-Scraping/mongo*
 *.json*
 *.pkl*
-*word2vec*
+*word2vec_model*
 *.bin*
 *.vec*
 *test*
