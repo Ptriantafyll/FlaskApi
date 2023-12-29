@@ -26,14 +26,7 @@ word2vec_model = Word2Vec.load(
 # Returns user-url matrix as pandas DataFrame 
 df = matrix_factorization.perform_martix_factorization()
 
-# # ? File that contains all the users in the mongodb cluster
-# user_file = open(
-#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\users.json")
-# users = json.load(user_file)
-
 # ? File that contains all the urls in the mongodb cluster
-# url_file = open(
-#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf-8")
 url_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls_without_errors.json", encoding="utf-8")
 urls = json.load(url_file)
@@ -43,12 +36,10 @@ urls = json.load(url_file)
 # nltk.download('stopwords')
 
 # pick a user from pandas df
-# user = df.index[0]
-user = df.index[11]
+user = df.index[1]
 
 ratings = []
 documents = []
-raw_documents = []
 # take english stopwords from nltk
 stop_words = set(stopwords.words('english'))
 # ? File that contains the greek stopwords
@@ -59,10 +50,7 @@ greek_stop_words = json.load(greek_stop_words_file)
 counter = 0
 for url in df.columns:
     ratings.append(df.loc[user,url])
-    # print(url)
-    # print(df.loc[user,url])
     counter = counter + 1
-    print(counter)
 
     # ? check if the url exists to get the text
     for link in urls:
@@ -70,14 +58,13 @@ for url in df.columns:
             text = link["text"]
             url_language = link["language"]
             break
-    # ? text now has the text of the url
 
+    # ? text now has the text of the url
     lower_case_text = normalize.strip_accents_and_lowercase(text)
     tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove punctuation
     words = tokenizer.tokenize(lower_case_text)
     words = [word for word in words if word.isalpha(
     ) and word not in stop_words and word not in greek_stop_words]  # ? remove numbers and stopwords
-    raw_documents.append(text)
     documents.append(words)
 
 
@@ -125,7 +112,6 @@ embedding_layer = Embedding(input_dim=word2vec_model.wv.vectors.shape[0],
                             trainable=False, name="word2vec_embeddings")(input_layer)
 
 # LSTM layer
-# x = LSTM(units=512, dropout=0.2, return_sequences=True)(x)
 lstm_layer = LSTM(units=512, dropout=0.2)(embedding_layer)
 dropout_layer = Dropout(0.2)(lstm_layer)
 
@@ -144,23 +130,12 @@ LSTM_model.summary()  # Print model
 LSTM_model.fit(documents_train, ratings_train,  validation_data=(
     documents_test, ratings_test), epochs=20, batch_size=32)
 
-# Evaluate the model on the test data
-loss, accuracy = LSTM_model.evaluate(
-    documents_test, ratings_test)
-
-# Print the evaluation results
-print("Test Loss:", loss)
-print("Test Accuracy:", accuracy)
 
 predictions = LSTM_model.predict(documents_test)
 predicted_classes = np.argmax(predictions, axis=1)
-print(ratings_test)
-print(predicted_classes)
 
 # Compute the confusion matrix
 cm = confusion_matrix(ratings_test, predicted_classes)
-print(cm)
-
 # Display the confusion matrix using seaborn for better visualization
 plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
@@ -169,19 +144,14 @@ plt.ylabel('True')
 plt.title('Confusion Matrix')
 plt.show()
 
-# predictions = LSTM_model.predict(documents_train)
-# predicted_classes = np.argmax(predictions, axis=1)
-# print(ratings_train)
-# print(predicted_classes)
+predictions = LSTM_model.predict(documents_train)
+predicted_classes = np.argmax(predictions, axis=1)
 
-# cm = confusion_matrix(ratings_train, predicted_classes)
-# print(cm)
-
-
-# # Display the confusion matrix using seaborn for better visualization
-# plt.figure(figsize=(8, 6))
-# sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
-# plt.xlabel('Predicted')
-# plt.ylabel('True')
-# plt.title('Confusion Matrix')
-# plt.show()
+cm = confusion_matrix(ratings_train, predicted_classes)
+# Display the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.title('Confusion Matrix')
+plt.show()

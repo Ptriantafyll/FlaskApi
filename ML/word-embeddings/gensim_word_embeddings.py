@@ -1,11 +1,9 @@
 
 # ? here will be the code for gensim word embeddings
-from gensim.models import Word2Vec
-import nltk
-from nltk.corpus import stopwords
 import json
 import logging
-import unicodedata
+from gensim.models import Word2Vec
+from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 from functions import normalize
 
