@@ -1,8 +1,9 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
+import tensorflow as tf
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
-from keras.layers import Embedding, LSTM, Dense, Input
+from keras.layers import Embedding, LSTM, Dense, Dropout, Input
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model
 from gensim.models import Word2Vec
@@ -34,8 +35,10 @@ user = users[1]
 # user = users[3] #- user with the least # of ratings -> fast model training
 
 # ? File that contains all the urls in the mongodb cluster
+# url_file = open(
+#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf-8")
 url_file = open(
-    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf-8")
+    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls_without_errors.json", encoding="utf-8")
 urls = json.load(url_file)
 
 ratings = []
@@ -115,12 +118,14 @@ lstm_layer = LSTM(units=512, dropout=0.2)(embedding_layer)
 
 # Output layer
 intermediate_layer = Dense(64, activation='relu')(lstm_layer)
-output_layer = Dense(5, activation='softmax')(intermediate_layer)
+dropout_layer = Dropout(0.2)(intermediate_layer)
+output_layer = Dense(5, activation='softmax')(dropout_layer)
 
 # Create lstm model
 LSTM_model = Model(inputs=input_layer, outputs=output_layer)
+optimizer = tf.keras.optimizers.Adam(learning_rate = 1e-4)
 LSTM_model.compile(loss='sparse_categorical_crossentropy',
-                   optimizer='adam', metrics=['accuracy'])
+                   optimizer=optimizer, metrics=['accuracy'])
 
 LSTM_model.summary()  # Print model
 # Train model
