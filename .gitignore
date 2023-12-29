@@ -12,3 +12,6 @@ Web-Scraping/mongo*
 *word2vec*
 *.bin*
 *.vec*
+*test*
+*rating_model*
+*images*

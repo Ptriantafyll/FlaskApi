@@ -14,13 +14,18 @@ import tensorflow as tf
 ft = fasttext.load_model(
     r"C:\Users\ptria\source\repos\FlaskApi\ML\word-embeddings\cc.el.300.bin")
 
-user_file = open(
-    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\users.json")
-users = json.load(user_file)
+# This is needed to import a function from different directory
+import sys
+sys.path.append(r"C:\Users\ptria\source\repos\FlaskApi\ML")
+import matrix_factorization
 
-# # todo ? cluster of users
-user = users[1]
-# user = users[3]  # - user with the least # of ratings -> fast model training
+# Returns user-url matrix as pandas DataFrame 
+df = matrix_factorization.perform_martix_factorization()
+
+# ? File that contains all the users in the mongodb cluster
+# user_file = open(
+#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\users.json")
+# users = json.load(user_file)
 
 # ? File that contains all the urls in the mongodb cluster
 # url_file = open(
@@ -29,18 +34,27 @@ url_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls_without_errors.json", encoding="utf-8")
 urls = json.load(url_file)
 
+# pick a user from pandas df
+# user = df.index[0]
+user = df.index[11]
+
 # Preprocess user's ratings
 ratings = []
 documents = []
-for link in user["links"]:
-    ratings.append(link["rating"])
-    # ? check if the url exists to get the text, otherwise use selenium?
-    for url in urls:
-        if link["url"] == url["url"]:
-            text = url["text"]
-            language = url["language"]
-            break
+counter = 0
+for url in df.columns:
+    ratings.append(df.loc[user,url])
+    # print(url)
+    # print(df.loc[user,url])
+    counter = counter + 1
+    print(counter)
 
+    # ? check if the url exists to get the text
+    for link in urls:
+        if url == link["url"]:
+            text = link["text"]
+            url_language = link["language"]
+            break
     # ? text now has the text of the url
     documents.append(text)
 
@@ -108,32 +122,32 @@ LSTM_model.compile(loss='sparse_categorical_crossentropy',
 LSTM_model.summary()  # print model
 # Train model
 LSTM_model.fit(documents_train, ratings_train,  validation_data=(
-    documents_test, ratings_test), epochs=10, batch_size=32)
+    documents_test, ratings_test), epochs=20, batch_size=32)
 
-# # Evaluate the model on the test data
-# loss, accuracy = LSTM_model.evaluate(
-#     documents_test, ratings_test)
+# Evaluate the model on the test data
+loss, accuracy = LSTM_model.evaluate(
+    documents_test, ratings_test)
 
-# # Print the evaluation results
-# print("Test Loss:", loss)
-# print("Test Accuracy:", accuracy)
+# Print the evaluation results
+print("Test Loss:", loss)
+print("Test Accuracy:", accuracy)
 
-# predictions = LSTM_model.predict(documents_test)
-# predicted_classes = np.argmax(predictions, axis=1)
-# print(ratings_test)
-# print(predicted_classes)
+predictions = LSTM_model.predict(documents_test)
+predicted_classes = np.argmax(predictions, axis=1)
+print(ratings_test)
+print(predicted_classes)
 
-# # Compute the confusion matrix
-# cm = confusion_matrix(ratings_test, predicted_classes)
-# print(cm)
+# Compute the confusion matrix
+cm = confusion_matrix(ratings_test, predicted_classes)
+print(cm)
 
-# # Display the confusion matrix using seaborn for better visualization
-# plt.figure(figsize=(8, 6))
-# sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
-# plt.xlabel('Predicted')
-# plt.ylabel('True')
-# plt.title('Confusion Matrix')
-# plt.show()
+# Display the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.title('Confusion Matrix')
+plt.show()
 
 # predictions = LSTM_model.predict(documents_train)
 # predicted_classes = np.argmax(predictions, axis=1)
