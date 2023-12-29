@@ -125,20 +125,10 @@ for layer in rating_model.layers[:3]:
 rating_model.summary()
 
 lr = 2e-4
-# optimizer = tf.keras.optimizers.Adam(
-#     learning_rate = lr
-# )
-# optimizer = tf.keras.optimizers.RMSprop(
-#     learning_rate = lr
-# )
-# this did pretty good
 optimizer = tf.keras.optimizers.Nadam(
     learning_rate = lr
 )
-# optimizer = tf.keras.optimizers.SGD(learning_rate=1e-3, momentum=0.9, clipvalue=0.5)
-# optimizer = tf.keras.optimizers.AdamW(
-#     learning_rate = lr
-# )
+
 # Train model
 rating_model.compile(
     optimizer=optimizer, loss='mean_squared_error', metrics=['mae'])
