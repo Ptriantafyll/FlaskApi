@@ -3,12 +3,13 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
-from keras.layers import Embedding, LSTM, Dense, Input
+from keras.layers import Embedding, LSTM, Dense, Dropout, Input
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model
 from gensim.models import Word2Vec
 import json
 import numpy as np
+import tensorflow as tf
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 
@@ -31,8 +32,10 @@ df = matrix_factorization.perform_martix_factorization()
 # users = json.load(user_file)
 
 # ? File that contains all the urls in the mongodb cluster
+# url_file = open(
+#     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf-8")
 url_file = open(
-    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.json", encoding="utf-8")
+    r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls_without_errors.json", encoding="utf-8")
 urls = json.load(url_file)
 
 # ? The following lines are needed only the first time you run the code
@@ -124,10 +127,12 @@ embedding_layer = Embedding(input_dim=word2vec_model.wv.vectors.shape[0],
 # LSTM layer
 # x = LSTM(units=512, dropout=0.2, return_sequences=True)(x)
 lstm_layer = LSTM(units=512, dropout=0.2)(embedding_layer)
+dropout_layer = Dropout(0.2)(lstm_layer)
 
 # Output layer
-intermediate_layer = Dense(64, activation='relu')(lstm_layer)
-output_layer = Dense(5, activation='softmax')(intermediate_layer)
+intermediate_layer = Dense(64, activation='relu')(dropout_layer)
+dropout_layer = Dropout(0.2)(intermediate_layer)
+output_layer = Dense(5, activation='softmax')(dropout_layer)
 
 # Create lstm model
 LSTM_model = Model(inputs=input_layer, outputs=output_layer)
