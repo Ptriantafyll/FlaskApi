@@ -100,11 +100,11 @@ embedding_layer = Embedding(
     trainable=False)(input_layer)
 
 # LSTM layer
-lstm_layer = LSTM(units=512, dropout=0.4)(embedding_layer)
+lstm_layer = LSTM(units=1024, dropout=0.5)(embedding_layer)
 
 # Output layer
-intermediate_layer = Dense(64, activation='relu')(lstm_layer)
-output_layer = Dense(1, activation='linear')(intermediate_layer)
+# intermediate_layer = Dense(64, activation='relu')(lstm_layer)
+output_layer = Dense(1, activation='linear')(lstm_layer)
 
 # Create lstm model
 LSTM_model = Model(inputs=input_layer, outputs=output_layer)
