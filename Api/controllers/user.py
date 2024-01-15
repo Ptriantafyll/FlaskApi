@@ -9,6 +9,19 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import numpy as np
+from transformers import TFDistilBertForSequenceClassification
+from transformers import AutoTokenizer
+
+# This is needed to import a function from different directory
+import sys
+sys.path.append(r"C:\Users\ptria\source\repos\FlaskApi\ML")
+from ML.functions import preprocess
+
+# ? Load pretrained tokenizer
+tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
+# ? distilbert base model with pretrained weights
+pretrained_bert = TFDistilBertForSequenceClassification.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
 
 def create_user():
     db = mongoDB_connection.db
@@ -85,7 +98,6 @@ def get_ratings_for_user(str_userId, links_to_rate):
     ratings = {}
     for url in links_to_rate:
         # todo: Step 1 get text of all websites (links_to_rate) using selenium
-
         chrome_options = Options()
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--headless')
@@ -109,9 +121,31 @@ def get_ratings_for_user(str_userId, links_to_rate):
             print("got text of: ", url)
 
             # todo: Step 2 tokenize text and make it into a structure that bert can use
+            input_ids = np.zeros(
+            (len(links_to_rate), 128)) 
+            attention_masks = np.zeros((len(links_to_rate), 128))
+            counter = 0
 
-            # todo: Step 3 user_model.predict
-            # todo: Step 4 ratings[url] = prediction rounded,capped
+            website_text = preprocess.clean_website_text(website_text)
+            website_text = website_text.lower()
+            website_text = preprocess.filter_sentences_english_and_greek(website_text)
+                
+            # encode text
+            tokenized_text = tokenizer.encode_plus(
+                website_text,
+                max_length=128,
+                truncation=True,
+                padding='max_length',
+                add_special_tokens=True,
+                return_tensors='tf'
+            )
+            input_ids[counter, :] = tokenized_text.input_ids
+            attention_masks[counter, :] = tokenized_text.attention_mask
+            counter = counter + 1
+            
+
+    # todo: Step 3 user_model.predict    
+    # todo: Step 4 ratings[url] = prediction rounded,capped
         except Exception as e:
             print("error" + str(e))
         finally:
