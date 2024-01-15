@@ -14,4 +14,6 @@ Web-Scraping/mongo*
 *.vec*
 *test*
 *rating_model*
+*fasttext_recommender*
+*word2vec_recommender*
 *images*
