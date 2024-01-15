@@ -50,7 +50,7 @@ sequences = tokenizer.texts_to_sequences(documents)
 
 # max_sequence_length = max(len(seq) for seq in sentence_sequences)
 # ? use max length 512 instead of the max length of all sequences
-max_sequence_length = 512
+max_sequence_length = 128
 # Pad sequences
 padded_sequences = pad_sequences(
     sequences=sequences, maxlen=max_sequence_length, padding='post', truncating='post')

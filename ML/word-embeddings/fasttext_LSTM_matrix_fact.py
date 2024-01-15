@@ -28,7 +28,7 @@ url_file = open(
 urls = json.load(url_file)
 
 # pick a user from pandas df
-user = df.index[1]
+user = df.index[11]
 
 # Preprocess user's ratings
 ratings = []
@@ -55,7 +55,7 @@ sequences = tokenizer.texts_to_sequences(documents)
 
 # max_sequence_length = max(len(seq) for seq in sentence_sequences)
 # ? use max length 512 instead of the max length of all sequences
-max_sequence_length = 512
+max_sequence_length = 128
 # Pad sequences
 padded_sequences = pad_sequences(
     sequences=sequences, maxlen=max_sequence_length, padding='post', truncating='post')
@@ -105,21 +105,30 @@ embedding_layer = Embedding(
     trainable=False)(input_layer)
 
 # LSTM layer
-lstm_layer = LSTM(units=512, dropout=0.4)(embedding_layer)
+lstm_layer = LSTM(units=512, dropout=0.5, return_sequences=True)(embedding_layer)
+lstm_layer = LSTM(units=512, dropout=0.5)(lstm_layer)
+
+dropout_percent = 0.4
+x = Dense(64, activation='relu')(lstm_layer)
+x = tf.keras.layers.Dropout(dropout_percent)(x)
+x = Dense(64, activation='relu')(x)
+x = tf.keras.layers.Dropout(dropout_percent)(x)
+# Output layer
+output_layer = Dense(1, activation='linear')(x)
 
 # Output layer
-intermediate_layer = Dense(64, activation='relu')(lstm_layer)
-output_layer = Dense(1, activation='linear')(intermediate_layer)
+# intermediate_layer = Dense(64, activation='relu')(lstm_layer)
+output_layer = Dense(1, activation='linear')(lstm_layer)
 
 # Create lstm model
 LSTM_model = Model(inputs=input_layer, outputs=output_layer)
-optimizer = tf.keras.optimizers.Adam(learning_rate = 1e-4)
+optimizer = tf.keras.optimizers.Adam(learning_rate = 2e-4)
 LSTM_model.compile(optimizer=optimizer, loss='mean_squared_error', metrics=['mae'])
 
 LSTM_model.summary()  # Print model
 # Train model
 history = LSTM_model.fit(documents_train, ratings_train,  validation_data=(
-    documents_val, ratings_val), epochs=10, batch_size=32, class_weight=class_weights_dict)
+    documents_val, ratings_val), epochs=100, batch_size=32, class_weight=class_weights_dict)
 
 
 # Plot training and validation loss
@@ -179,3 +188,6 @@ plt.ylabel('True')
 plt.title('Confusion Matrix')
 plt.savefig(r"C:\Users\ptria\source\repos\FlaskApi\images\fasttext\test_cm.png")
 plt.show()
+
+# Save model
+LSTM_model.save('fasttext_recommender')

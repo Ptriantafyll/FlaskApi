@@ -124,7 +124,7 @@ for layer in rating_model.layers[:3]:
 # Print model
 rating_model.summary()
 
-lr = 2e-4
+lr = 3e-4
 optimizer = tf.keras.optimizers.Nadam(
     learning_rate = lr
 )
@@ -133,7 +133,7 @@ optimizer = tf.keras.optimizers.Nadam(
 rating_model.compile(
     optimizer=optimizer, loss='mean_squared_error', metrics=['mae'])
 
-num_of_epochs = 400
+num_of_epochs = 100
 # To add class weight: class_weight=class_weights_dict
 history = rating_model.fit(
     [X_train,train_mask],
@@ -212,13 +212,12 @@ plt.title('Confusion Matrix')
 plt.savefig(r"C:\Users\ptria\source\repos\FlaskApi\images\test_cm.png")
 plt.show()
 
-
-print("Parameters for this run\n\n")
-print("Optimizer: ", optimizer)
-print("Learning rate: ", lr)
-print("Neurons: ", num_of_neurons)
-print("Dropout: ", dropout_percent)
-print("L2 Regularizer weight:", l2_regularizer_weight)
-print("Epochs: ", num_of_epochs)
-print("Max length: ", max_length)
-print("transformer: ", pretrained_bert)
+# print("Parameters for this run\n\n")
+# print("Optimizer: ", optimizer)
+# print("Learning rate: ", lr)
+# print("Neurons: ", num_of_neurons)
+# print("Dropout: ", dropout_percent)
+# print("L2 Regularizer weight:", l2_regularizer_weight)
+# print("Epochs: ", num_of_epochs)
+# print("Max length: ", max_length)
+# print("transformer: ", pretrained_bert)

@@ -37,7 +37,7 @@ urls = json.load(url_file)
 # nltk.download('stopwords')
 
 # pick a user from pandas df
-user = df.index[1]
+user = df.index[11]
 
 ratings = []
 documents = []
@@ -112,7 +112,7 @@ class_weights = compute_class_weight('balanced', classes=np.unique(ratings_train
 class_weights_dict = dict(enumerate(class_weights))
 
 # Input layer
-input_layer = Input((max_sequence_length,), name="input layer")
+input_layer = Input((max_sequence_length,))
 
 # Embedding layer
 embedding_layer = Embedding(input_dim=word2vec_model.wv.vectors.shape[0],
@@ -122,11 +122,16 @@ embedding_layer = Embedding(input_dim=word2vec_model.wv.vectors.shape[0],
                             trainable=False, name="word2vec_embeddings")(input_layer)
 
 # LSTM layer
-lstm_layer = LSTM(units=512, dropout=0.5)(embedding_layer)
+lstm_layer = LSTM(units=512, dropout=0.5, return_sequences=True)(embedding_layer)
+lstm_layer = LSTM(units=512, dropout=0.5)(lstm_layer)
 
+dropout_percent = 0.4
+x = Dense(64, activation='relu')(lstm_layer)
+x = tf.keras.layers.Dropout(dropout_percent)(x)
+x = Dense(64, activation='relu')(x)
+x = tf.keras.layers.Dropout(dropout_percent)(x)
 # Output layer
-intermediate_layer = Dense(64, activation='relu')(lstm_layer)
-output_layer = Dense(1, activation='linear')(intermediate_layer)
+output_layer = Dense(1, activation='linear')(x)
 
 # Create lstm model
 LSTM_model = Model(inputs=input_layer, outputs=output_layer)
@@ -196,3 +201,6 @@ plt.ylabel('True')
 plt.title('Confusion Matrix')
 plt.savefig(r"C:\Users\ptria\source\repos\FlaskApi\images\word2vec\test_cm.png")
 plt.show()
+
+# Save model
+# LSTM_model.save('word2vec_recommender')
