@@ -9,9 +9,11 @@ ML/*/mongo*
 Web-Scraping/mongo*
 *.json*
 *.pkl*
-*word2vec*
+*word2vec_model*
 *.bin*
 *.vec*
 *test*
 *rating_model*
+*fasttext_recommender*
+*word2vec_recommender*
 *images*
