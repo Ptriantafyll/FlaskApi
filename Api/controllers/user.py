@@ -3,6 +3,12 @@ from models import user
 import mongoDB_connection
 import random
 import tensorflow as tf
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
 
 def create_user():
     db = mongoDB_connection.db
@@ -68,21 +74,50 @@ def get_ratings_for_user(str_userId, links_to_rate):
     userId = ObjectId(str_userId)
     current_user = db.get_collection("user").find_one({"_id": userId})
 
-    ratings = {}
-    for url in links_to_rate:
-        ratings[url] = random.randint(1, 5)
+    # for url in links_to_rate:
+        # ratings[url] = random.randint(1, 5)
 
     # todo: for now generate random number for each link in links_to_rate
     # todo: later make the rating based on the model of the user
 
     user_model = tf.keras.models.load_model(r"C:\Users\ptria\source\repos\FlaskApi\rating_model")
 
-    # for url in links_to_rate:
-
+    ratings = {}
+    for url in links_to_rate:
         # todo: Step 1 get text of all websites (links_to_rate) using selenium
-        # todo: Step 2 tokenize text and make it into a structure that bert can use
-        # todo: Step 3 user_model.predict
-        # todo: Step 4 ratings[url] = prediction rounded,capped
+
+        chrome_options = Options()
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        driver = webdriver.Chrome(chrome_options=chrome_options)
+
+        driver.maximize_window()
+        try:
+            driver.get(url)
+            time.sleep(5)
+
+            timeout = 10
+            wait = WebDriverWait(driver, timeout)
+            # ? check if website has a body
+            element_present = EC.presence_of_element_located(
+                (By.XPATH, "/html/body"))
+
+            wait.until(element_present)
+            print(url, " loaded successfully!")
+            website_text = driver.find_element(By.XPATH, "/html/body").text
+            print("got text of: ", url)
+
+            # todo: Step 2 tokenize text and make it into a structure that bert can use
+
+            # todo: Step 3 user_model.predict
+            # todo: Step 4 ratings[url] = prediction rounded,capped
+        except Exception as e:
+            print("error" + str(e))
+        finally:
+            print("quitting driver")
+            driver.quit()
+
 
     return ratings
 
