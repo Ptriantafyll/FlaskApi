@@ -11,7 +11,7 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (accuracy_score, f1_score, mean_squared_error,
-                             r2_score)
+                             r2_score, mean_absolute_error)
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
@@ -35,7 +35,7 @@ url_file = open(r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\urls.js
 urls = json.load(url_file)
 
 # pick a user from pandas df
-user = df.index[11]
+user = df.index[1]
 
 # ? take greek stop words from file
 greek_stop_words_file = open(
@@ -53,6 +53,7 @@ tokenized_documents = []
 not_found =[]
 counter = 0
 for url in df.columns:
+    print(counter)
     counter = counter + 1
 
     # ? check if the url exists to get the text
@@ -104,16 +105,19 @@ documents_train, documents_test, ratings_train, ratings_test = train_test_split(
     documents_tfidf, ratings, test_size=0.2, random_state=21)
 
 # Logistic Regression Model Training
-logreg_model = LogisticRegression(max_iter=2000)
+logreg_model = LogisticRegression(max_iter=10000)
 logreg_model.fit(documents_train, ratings_train)
 
 # LogReg Model Evaluation
 ratings_pred = logreg_model.predict(documents_test)
 accuracy = accuracy_score(ratings_test, ratings_pred)
+print(ratings_test, ratings_pred)
 print("Accuracy:", accuracy)
 # Calculate Mean Squared Error
 mse = mean_squared_error(ratings_test, ratings_pred)
 print("Mean Squared Error:", mse)
+mae = mean_absolute_error(ratings_test, ratings_pred)
+print("Mean Absolute Error:", mae)
 # Calculate F1 score
 f1 = f1_score(ratings_test, ratings_pred, average="weighted")
 print("F1 Score:", f1)
@@ -128,7 +132,7 @@ plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
 plt.xlabel('Predicted')
 plt.ylabel('True')
-plt.title('Confusion Matrix')
+plt.title('Logistic Regression Confusion Matrix')
 plt.show()
 
 
@@ -142,26 +146,29 @@ svm_model.fit(documents_train, ratings_train)
 
 # SVM Model Evaluation
 ratings_pred_svm = svm_model.predict(documents_test)
+print(ratings_test, ratings_pred_svm)
 accuracy_svm = accuracy_score(ratings_test, ratings_pred_svm)
 print("SVM Accuracy:", accuracy_svm)
 # Calculate Mean Squared Error
-mse = mean_squared_error(ratings_test, ratings_pred)
+mse = mean_squared_error(ratings_test, ratings_pred_svm)
 print("Mean Squared Error:", mse)
+mae = mean_absolute_error(ratings_test, ratings_pred_svm)
+print("Mean Absolute Error:", mae)
 # Calculate F1 score
-f1 = f1_score(ratings_test, ratings_pred, average="weighted")
+f1 = f1_score(ratings_test, ratings_pred_svm, average="weighted")
 print("F1 Score:", f1)
 # Calculate R2 score
-r2 = r2_score(ratings_test, ratings_pred)
+r2 = r2_score(ratings_test, ratings_pred_svm)
 print("R2 Score:", r2)
 
 # Compute the confusion matrix
-cm = confusion_matrix(ratings_test, ratings_pred)
+cm = confusion_matrix(ratings_test, ratings_pred_svm)
 # Display the confusion matrix using seaborn for better visualization
 plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
 plt.xlabel('Predicted')
 plt.ylabel('True')
-plt.title('Confusion Matrix')
+plt.title('SVM Confusion Matrix')
 plt.show()
 
 # ? decision tree (για σύγκριση)
@@ -172,26 +179,29 @@ tree_model.fit(documents_train, ratings_train)
 
 # Decision Tree Model Evaluation
 ratings_pred_tree = tree_model.predict(documents_test)
+print(ratings_test, ratings_pred_tree)
 accuracy_tree = accuracy_score(ratings_test, ratings_pred_tree)
 print("Decision Tree Accuracy:", accuracy_tree)
 # Calculate Mean Squared Error
-mse = mean_squared_error(ratings_test, ratings_pred)
+mse = mean_squared_error(ratings_test, ratings_pred_tree)
 print("Mean Squared Error:", mse)
+mae = mean_absolute_error(ratings_test, ratings_pred_tree)
+print("Mean Absolute Error:", mae)
 # Calculate F1 score
-f1 = f1_score(ratings_test, ratings_pred, average="weighted")
+f1 = f1_score(ratings_test, ratings_pred_tree, average="weighted")
 print("F1 Score:", f1)
 # Calculate R2 score
-r2 = r2_score(ratings_test, ratings_pred)
+r2 = r2_score(ratings_test, ratings_pred_tree)
 print("R2 Score:", r2)
 
 # Compute the confusion matrix
-cm = confusion_matrix(ratings_test, ratings_pred)
+cm = confusion_matrix(ratings_test, ratings_pred_tree)
 # Display the confusion matrix using seaborn for better visualization
 plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
 plt.xlabel('Predicted')
 plt.ylabel('True')
-plt.title('Confusion Matrix')
+plt.title('Decision Tree Confusion Matrix')
 plt.show()
 
 
