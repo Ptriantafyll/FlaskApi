@@ -78,10 +78,7 @@ for sentence in documents:
     sentence_sequences.append(indices)
 
 # Pad sequences
-# max_sequence_length = max(len(seq) for seq in sentence_sequences)
-# ? use max length 512 instead of the max length of all sequences
 max_sequence_length = 128
-print("max sequence length: ", max_sequence_length)
 
 # ? Word2Vec model embeddings
 embeddings = pad_sequences(

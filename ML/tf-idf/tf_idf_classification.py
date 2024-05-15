@@ -29,8 +29,6 @@ urls = json.load(url_file)
 
 # ? Pick a user
 user = users[11]
-print("User is: ", user["_id"])
-
 
 # ? take greek stop words from file
 greek_stop_words_file = open(
@@ -106,10 +104,6 @@ print("F1 Score:", f1)
 # Calculate R2 score
 r2 = r2_score(ratings_test, ratings_pred)
 print("R2 Score:", r2)
-
-print(ratings_pred)
-print(ratings_test)
-print(ratings_train)
 
 # SVM Model Training
 svm_model = SVC(kernel='rbf')

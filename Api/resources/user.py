@@ -4,7 +4,17 @@ from flask_restful import Resource
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+import undetected_chromedriver as uc
+from urllib.parse import urlparse
 
+
+def extract_base_urls(urls):
+    base_urls = set()
+    for url in urls:
+        parsed_url = urlparse(url)
+        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
+        base_urls.add(base_url)
+    return base_urls
 
 class HomePage(Resource):
     def get(self):
@@ -30,23 +40,27 @@ class NewRating(Resource):
         return {"num_of_rated_links": num_of_links}, 200
 
 
+from flask_cors import cross_origin
 class GetRatings(Resource):
     # ? generates ratings
+    @cross_origin()
     def post(self, userId):
         data = request.json
         url = data["url"]
 
-        chrome_options = Options()
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--disable-dev-shm-usage')
-        driver = webdriver.Chrome(chrome_options=chrome_options)
+        options = uc.ChromeOptions()
+        options.add_argument("--headless=new")
+        driver = uc.Chrome(options=options)
 
         driver.maximize_window()
         driver.get(url)
         links_of_current_page = [link.get_attribute(
             'href') for link in driver.find_elements(By.TAG_NAME, "a")]
         driver.quit()
+
+        links_of_current_page = set(links_of_current_page)
+        # links_of_current_page = extract_base_urls(links_of_current_page)
+        links_of_current_page = [link for link in links_of_current_page if url not in link]
 
         ratings = user_controller.get_ratings_for_user(
             userId, links_of_current_page)

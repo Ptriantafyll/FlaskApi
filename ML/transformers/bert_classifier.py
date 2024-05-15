@@ -19,35 +19,6 @@ url_file = open(
 urls = json.load(url_file)
 
 
-# Find max length
-# max_len = 0
-# for i in range(len(urls)):
-#     text = urls[i]['text']
-#     print(urls[i]['url'], " : ", urls[i]['language'])
-
-#     # Tokenize the text and add `[CLS]` and `[SEP]` tokens.
-#     input_ids = tokenizer.encode(text, add_special_tokens=True)
-
-#     # Update the maximum sentence length.
-#     max_len = max(max_len, len(input_ids))
-
-# todo: if max_length > 512 -> max length = 512
-# print('Max sentence length: ', max_len)
-
-# Example of encode_plus
-# my_text = urls[0]['text']
-# token = tokenizer.encode_plus(
-#     my_text,
-#     max_length=329295,
-#     truncation=True,
-#     padding='max_length',
-#     add_special_tokens=True,
-#     return_tensors='tf'
-# )
-# print(token)
-# print(token.input_ids)
-# print(token.attention_mask)
-
 # ? File that contains all the users in the mongodb cluster
 user_file = open(
     r"C:\Users\ptria\source\repos\FlaskApi\Web-Scraping\json\users.json", encoding="utf8")
@@ -55,8 +26,6 @@ users = json.load(user_file)
 user = users[0]
 
 
-# max_length = 329295
-# ? use max length 512 instead of the max length of all sequences
 max_length = 512
 documents_input_ids = np.zeros(
     (len(user['links']), max_length))  # ids of the bert tokenizer
