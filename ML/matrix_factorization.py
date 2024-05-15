@@ -67,4 +67,4 @@ def perform_martix_factorization():
 
 # Optionally, you can save the user-url matrix to a CSV file
 # new_user_url_df.to_csv(
-#     r"C:\Users\ptria\source\repos\FlaskApi\ML\user_url_matrix_new.csv")
+#     r"C:\Users\ptria\source\repos\FlaskApi\ML\user_url_matrix.csv")

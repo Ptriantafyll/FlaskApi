@@ -53,7 +53,6 @@ tokenized_documents = []
 not_found =[]
 counter = 0
 for url in df.columns:
-    print(counter)
     counter = counter + 1
 
     # ? check if the url exists to get the text
@@ -88,7 +87,6 @@ for url in df.columns:
         tokenized_documents.append(lemmatized_words)
         ratings.append(df.loc[user,url])
     else:
-        print(url, " ", url_language)
         not_found.append(url)
 
 

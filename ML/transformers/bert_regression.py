@@ -37,7 +37,7 @@ pretrained_bert = TFDistilBertForSequenceClassification.from_pretrained("distilb
 
 
 dataset_length = len(df.columns)
-# ? use max length 512 instead of the max length of all sequences
+# ? use max length 128 instead of the max length of all sequences
 max_length = 128
 documents_input_ids = np.zeros(
     (dataset_length, max_length))  # ids of the bert tokenizer
