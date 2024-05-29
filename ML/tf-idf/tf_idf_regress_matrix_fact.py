@@ -27,6 +27,74 @@ import matrix_factorization
 # nltk.download("stopwords")
 # nltk.download("punkt")
 
+global nlp_greek
+global nlp_english
+nlp_greek = spacy.load("el_core_news_sm")
+nlp_english = spacy.load("en_core_web_sm")
+
+
+def text_to_words(text):
+    lower_case_text = normalize.strip_accents_and_lowercase(text)
+    tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove punctuation
+    words = tokenizer.tokenize(lower_case_text)
+    words = [word for word in words if word.isalpha()]  # ? remove numbers
+
+    # ? remove english and greek stop words
+    filtered_words = [
+        w for w in words if not w in stop_words and not w in greek_stop_words and len(w) > 1]
+    # words.append(filtered_words)
+
+    return filtered_words
+
+
+def perform_stemming(filtered_words):
+    ps = PorterStemmer()
+    stemmed_words = [ps.stem(word) for word in filtered_words]
+
+    return stemmed_words
+
+
+def perform_lemmatization(filtered_words):
+
+    lemmatized_words = []
+    lemmatized_words = [nlp_english(token)[0].lemma_ if token.isascii(
+    ) else nlp_greek(token)[0].lemma_ for token in filtered_words]
+
+    return lemmatized_words
+
+
+def evaluate_model(model):
+    ratings_pred = model.predict(documents_test)
+    accuracy = accuracy_score(ratings_test, ratings_pred)
+    print(ratings_test, ratings_pred)
+    print("Accuracy:", accuracy)
+    # Calculate Mean Squared Error
+    mse = mean_squared_error(ratings_test, ratings_pred)
+    print("Mean Squared Error:", mse)
+    mae = mean_absolute_error(ratings_test, ratings_pred)
+    print("Mean Absolute Error:", mae)
+    # Calculate F1 score
+    f1 = f1_score(ratings_test, ratings_pred, average="weighted")
+    print("F1 Score:", f1)
+    # Calculate R2 score
+    r2 = r2_score(ratings_test, ratings_pred)
+    print("R2 Score:", r2)
+
+    return ratings_test, ratings_pred
+
+
+def calculate_confusion_matrix(ratings_test, ratings_pred):
+    # Compute the confusion matrix
+    cm = confusion_matrix(ratings_test, ratings_pred)
+    # Display the confusion matrix using seaborn for better visualization
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.title('Logistic Regression Confusion Matrix')
+    plt.show()
+
+
 df = matrix_factorization.perform_martix_factorization()
 
 # ? File that contains all the urls in the mongodb cluster
@@ -44,13 +112,11 @@ greek_stop_words = json.load(greek_stop_words_file)
 # take english stopwords from nltk
 stop_words = set(stopwords.words('english'))
 
-nlp_greek = spacy.load("el_core_news_sm")
-nlp_english = spacy.load("en_core_web_sm")
 
 # ? tokenize text of rated urls
 ratings = []
 tokenized_documents = []
-not_found =[]
+not_found = []
 counter = 0
 for url in df.columns:
     counter = counter + 1
@@ -63,29 +129,18 @@ for url in df.columns:
             break
     # ? text now has the text of the url
 
-    lower_case_text = normalize.strip_accents_and_lowercase(text)
-    tokenizer = RegexpTokenizer(r'\w+')  # ? tokenize and remove punctuation
-    words = tokenizer.tokenize(lower_case_text)
-    words = [word for word in words if word.isalpha()]  # ? remove numbers
-
-    # ? remove english and greek stop words
-    filtered_words = [
-        w for w in words if not w in stop_words and not w in greek_stop_words and len(w) > 1]
-    words.append(filtered_words)
-
+    filtered_words = text_to_words(text)
     # ? If the document is in english use stemming
-    if 'en' in url_language:
-        ps = PorterStemmer()
-        stemmed_words = [ps.stem(word) for word in filtered_words]
+    if 'en' in url["language"]:
+        stemmed_words = perform_stemming(filtered_words)
         tokenized_documents.append(stemmed_words)
-        ratings.append(df.loc[user,url])
+        ratings.append(df.loc[user, url])
+
     # ? If the document is in greek use lemmatizing
-    elif 'el' in url_language:
-        lemmatized_words = []
-        lemmatized_words = [nlp_english(token)[0].lemma_ if token.isascii(
-        ) else nlp_greek(token)[0].lemma_ for token in filtered_words]
+    if 'el' in url["language"]:
+        lemmatized_words = perform_lemmatization(filtered_words)
         tokenized_documents.append(lemmatized_words)
-        ratings.append(df.loc[user,url])
+        ratings.append(df.loc[user, url])
     else:
         not_found.append(url)
 
@@ -107,31 +162,8 @@ logreg_model = LogisticRegression(max_iter=10000)
 logreg_model.fit(documents_train, ratings_train)
 
 # LogReg Model Evaluation
-ratings_pred = logreg_model.predict(documents_test)
-accuracy = accuracy_score(ratings_test, ratings_pred)
-print(ratings_test, ratings_pred)
-print("Accuracy:", accuracy)
-# Calculate Mean Squared Error
-mse = mean_squared_error(ratings_test, ratings_pred)
-print("Mean Squared Error:", mse)
-mae = mean_absolute_error(ratings_test, ratings_pred)
-print("Mean Absolute Error:", mae)
-# Calculate F1 score
-f1 = f1_score(ratings_test, ratings_pred, average="weighted")
-print("F1 Score:", f1)
-# Calculate R2 score
-r2 = r2_score(ratings_test, ratings_pred)
-print("R2 Score:", r2)
-
-# Compute the confusion matrix
-cm = confusion_matrix(ratings_test, ratings_pred)
-# Display the confusion matrix using seaborn for better visualization
-plt.figure(figsize=(8, 6))
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
-plt.xlabel('Predicted')
-plt.ylabel('True')
-plt.title('Logistic Regression Confusion Matrix')
-plt.show()
+ratings_test, ratings_pred = evaluate_model(logreg_model)
+calculate_confusion_matrix(ratings_test, ratings_pred)
 
 
 # SVM Model Training
@@ -143,63 +175,15 @@ svm_model = SVC(kernel='rbf')
 svm_model.fit(documents_train, ratings_train)
 
 # SVM Model Evaluation
-ratings_pred_svm = svm_model.predict(documents_test)
-print(ratings_test, ratings_pred_svm)
-accuracy_svm = accuracy_score(ratings_test, ratings_pred_svm)
-print("SVM Accuracy:", accuracy_svm)
-# Calculate Mean Squared Error
-mse = mean_squared_error(ratings_test, ratings_pred_svm)
-print("Mean Squared Error:", mse)
-mae = mean_absolute_error(ratings_test, ratings_pred_svm)
-print("Mean Absolute Error:", mae)
-# Calculate F1 score
-f1 = f1_score(ratings_test, ratings_pred_svm, average="weighted")
-print("F1 Score:", f1)
-# Calculate R2 score
-r2 = r2_score(ratings_test, ratings_pred_svm)
-print("R2 Score:", r2)
+ratings_test, ratings_pred_svm = evaluate_model(svm_model)
+calculate_confusion_matrix(ratings_test, ratings_pred_svm)
 
-# Compute the confusion matrix
-cm = confusion_matrix(ratings_test, ratings_pred_svm)
-# Display the confusion matrix using seaborn for better visualization
-plt.figure(figsize=(8, 6))
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
-plt.xlabel('Predicted')
-plt.ylabel('True')
-plt.title('SVM Confusion Matrix')
-plt.show()
 
 # ? decision tree (για σύγκριση)
-
 # Decision Tree Model Training
 tree_model = DecisionTreeClassifier()
 tree_model.fit(documents_train, ratings_train)
 
 # Decision Tree Model Evaluation
-ratings_pred_tree = tree_model.predict(documents_test)
-print(ratings_test, ratings_pred_tree)
-accuracy_tree = accuracy_score(ratings_test, ratings_pred_tree)
-print("Decision Tree Accuracy:", accuracy_tree)
-# Calculate Mean Squared Error
-mse = mean_squared_error(ratings_test, ratings_pred_tree)
-print("Mean Squared Error:", mse)
-mae = mean_absolute_error(ratings_test, ratings_pred_tree)
-print("Mean Absolute Error:", mae)
-# Calculate F1 score
-f1 = f1_score(ratings_test, ratings_pred_tree, average="weighted")
-print("F1 Score:", f1)
-# Calculate R2 score
-r2 = r2_score(ratings_test, ratings_pred_tree)
-print("R2 Score:", r2)
-
-# Compute the confusion matrix
-cm = confusion_matrix(ratings_test, ratings_pred_tree)
-# Display the confusion matrix using seaborn for better visualization
-plt.figure(figsize=(8, 6))
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
-plt.xlabel('Predicted')
-plt.ylabel('True')
-plt.title('Decision Tree Confusion Matrix')
-plt.show()
-
-
+ratings_test, ratings_pred_tree = evaluate_model(tree_model)
+calculate_confusion_matrix(ratings_test, ratings_pred_tree)
