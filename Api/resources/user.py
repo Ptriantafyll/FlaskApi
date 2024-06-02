@@ -44,16 +44,18 @@ class NewRating(Resource):
 
 # Initializes chrome driver using selenium
 def initialize_chrome_with_selenium(url):
-    options = uc.ChromeOptions()
+    options = webdriver.ChromeOptions()
     options.add_argument("--headless=new")
     driver = uc.Chrome(options=options)
 
     driver.maximize_window()
     driver.get(url)
 
+    return driver
+
 
 # Gets the urls for a website
-def get_links_of_current_page(driver):
+def get_links_of_current_page(driver, url):
     links_of_current_page = [link.get_attribute(
         'href') for link in driver.find_elements(By.TAG_NAME, "a")]
     driver.quit()
@@ -74,7 +76,7 @@ class GetRatings(Resource):
         url = data["url"]
 
         driver = initialize_chrome_with_selenium(url)
-        links_of_current_page = get_links_of_current_page(driver)
+        links_of_current_page = get_links_of_current_page(driver, url)
 
         ratings = user_controller.get_ratings_for_user(
             userId, links_of_current_page)

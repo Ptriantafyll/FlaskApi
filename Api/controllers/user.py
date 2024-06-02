@@ -117,11 +117,16 @@ def user_adds_rating(userToUpdate, linkToUpdate):
 
 # Initializes chrome driver using (undetected) selenium
 def initialize_chrome_with_selenium():
-    chrome_options = Options()
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    driver = webdriver.Chrome(chrome_options=chrome_options)
+    # chrome_options = Options()
+    # chrome_options.add_argument('--no-sandbox')
+    # chrome_options.add_argument('--headless')
+    # chrome_options.add_argument('--disable-dev-shm-usage')
+    # driver = webdriver.Chrome(chrome_options=chrome_options)
+
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless=new")
+    driver = uc.Chrome(options=options)
+    driver.maximize_window()
 
     return driver
 
@@ -188,10 +193,6 @@ def get_ratings_for_user(str_userId, links_to_rate):
     user_model = tf.keras.models.load_model(
         r"C:\Users\ptria\source\repos\FlaskApi\rating_model")
 
-    options = uc.ChromeOptions()
-    options.add_argument("--headless=new")
-    driver = uc.Chrome(options=options)
-    driver.maximize_window()
 
     ratings = {}
     for url in links_to_rate:

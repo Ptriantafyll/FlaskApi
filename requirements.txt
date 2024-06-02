@@ -10,7 +10,7 @@ numpy
 flask_cors
 selenium
 pandas
-json
+# json
 scikit-learn
 nltk
 spacy
