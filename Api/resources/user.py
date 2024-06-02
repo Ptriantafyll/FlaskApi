@@ -1,3 +1,4 @@
+from flask_cors import cross_origin
 from controllers import user as user_controller
 from flask import request
 from flask_restful import Resource
@@ -15,6 +16,7 @@ def extract_base_urls(urls):
         base_url = f"{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
         base_urls.add(base_url)
     return base_urls
+
 
 class HomePage(Resource):
     def get(self):
@@ -40,7 +42,32 @@ class NewRating(Resource):
         return {"num_of_rated_links": num_of_links}, 200
 
 
-from flask_cors import cross_origin
+# Initializes chrome driver using selenium
+def initialize_chrome_with_selenium(url):
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless=new")
+    driver = uc.Chrome(options=options)
+
+    driver.maximize_window()
+    driver.get(url)
+
+    return driver
+
+
+# Gets the urls for a website
+def get_links_of_current_page(driver, url):
+    links_of_current_page = [link.get_attribute(
+        'href') for link in driver.find_elements(By.TAG_NAME, "a")]
+    driver.quit()
+
+    links_of_current_page = set(links_of_current_page)
+    # links_of_current_page = extract_base_urls(links_of_current_page)
+    links_of_current_page = [
+        link for link in links_of_current_page if url not in link]
+
+    return links_of_current_page
+
+
 class GetRatings(Resource):
     # ? generates ratings
     @cross_origin()
@@ -48,19 +75,8 @@ class GetRatings(Resource):
         data = request.json
         url = data["url"]
 
-        options = uc.ChromeOptions()
-        options.add_argument("--headless=new")
-        driver = uc.Chrome(options=options)
-
-        driver.maximize_window()
-        driver.get(url)
-        links_of_current_page = [link.get_attribute(
-            'href') for link in driver.find_elements(By.TAG_NAME, "a")]
-        driver.quit()
-
-        links_of_current_page = set(links_of_current_page)
-        # links_of_current_page = extract_base_urls(links_of_current_page)
-        links_of_current_page = [link for link in links_of_current_page if url not in link]
+        driver = initialize_chrome_with_selenium(url)
+        links_of_current_page = get_links_of_current_page(driver, url)
 
         ratings = user_controller.get_ratings_for_user(
             userId, links_of_current_page)

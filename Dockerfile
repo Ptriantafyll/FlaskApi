@@ -1,7 +1,9 @@
-FROM python:3.9-slim-buster
+FROM python:3
 
 WORKDIR /app
 
+# RUN apt-get install build-essential -y
+RUN apt-get upgrade -y
 COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt

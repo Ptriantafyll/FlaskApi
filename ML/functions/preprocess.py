@@ -2,6 +2,8 @@ import re
 import json
 from nltk.corpus import stopwords
 
+
+# Removes stop words from a given text
 def remove_stopwords(text):
 
     # ? take greek stop words from file
@@ -21,15 +23,17 @@ def remove_stopwords(text):
 
 
 def clean_text(temp):
-    temp=re.sub("@\S+", " ", temp)
-    temp=re.sub("https*\S+", " ", temp)
-    temp=re.sub("#\S+", " ", temp)
-    temp=re.sub("\'\w+", '', temp)
-    temp=re.sub(r'\w*\d+\w*', '', temp)
-    temp=re.sub('\s{2,}', " ", temp)
-    temp=re.sub('[^A-Za-z ]+', '', temp)
+    temp = re.sub("@\S+", " ", temp)
+    temp = re.sub("https*\S+", " ", temp)
+    temp = re.sub("#\S+", " ", temp)
+    temp = re.sub("\'\w+", '', temp)
+    temp = re.sub(r'\w*\d+\w*', '', temp)
+    temp = re.sub('\s{2,}', " ", temp)
+    temp = re.sub('[^A-Za-z ]+', '', temp)
     return temp.strip()
 
+
+# Removes all non english and non greek words from a text
 def filter_sentences_english_and_greek(text):
     # Split the text into sentences
     sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)

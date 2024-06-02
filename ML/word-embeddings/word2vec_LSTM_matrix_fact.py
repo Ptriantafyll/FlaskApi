@@ -1,3 +1,5 @@
+import matrix_factorization
+from functions import normalize
 import sys
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -17,14 +19,12 @@ from sklearn.utils.class_weight import compute_class_weight
 # This is needed to import a function from different directory
 import sys
 sys.path.append(r"C:\Users\ptria\source\repos\FlaskApi\ML")
-from functions import normalize
-import matrix_factorization
 
 # ? load word2vec model from file
 word2vec_model = Word2Vec.load(
     r"C:\Users\ptria\source\repos\FlaskApi\ML\word-embeddings\word2vec_model")
 
-# Returns user-url matrix as pandas DataFrame 
+# Returns user-url matrix as pandas DataFrame
 df = matrix_factorization.perform_martix_factorization()
 
 # ? File that contains all the urls in the mongodb cluster
@@ -50,7 +50,7 @@ greek_stop_words = json.load(greek_stop_words_file)
 # todo: change iterations and get data from pandas df
 counter = 0
 for url in df.columns:
-    ratings.append(df.loc[user,url])
+    ratings.append(df.loc[user, url])
     counter = counter + 1
 
     # ? check if the url exists to get the text
@@ -105,7 +105,8 @@ ratings_train = np.array(ratings_train)
 ratings_val = np.array(ratings_val)
 ratings_test = np.array(ratings_test)
 
-class_weights = compute_class_weight('balanced', classes=np.unique(ratings_train), y=ratings_train)
+class_weights = compute_class_weight(
+    'balanced', classes=np.unique(ratings_train), y=ratings_train)
 class_weights_dict = dict(enumerate(class_weights))
 
 # Input layer
@@ -119,7 +120,8 @@ embedding_layer = Embedding(input_dim=word2vec_model.wv.vectors.shape[0],
                             trainable=False, name="word2vec_embeddings")(input_layer)
 
 # LSTM layer
-lstm_layer = LSTM(units=512, dropout=0.5, return_sequences=True)(embedding_layer)
+lstm_layer = LSTM(units=512, dropout=0.5,
+                  return_sequences=True)(embedding_layer)
 lstm_layer = LSTM(units=512, dropout=0.5)(lstm_layer)
 
 dropout_percent = 0.4
@@ -132,8 +134,9 @@ output_layer = Dense(1, activation='linear')(x)
 
 # Create lstm model
 LSTM_model = Model(inputs=input_layer, outputs=output_layer)
-optimizer = tf.keras.optimizers.Adam(learning_rate = 1e-4)
-LSTM_model.compile(optimizer=optimizer, loss='mean_squared_error', metrics=['mae'])
+optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)
+LSTM_model.compile(optimizer=optimizer,
+                   loss='mean_squared_error', metrics=['mae'])
 
 LSTM_model.summary()  # Print model
 # Train model
@@ -161,7 +164,7 @@ plt.show()
 
 
 predictions = LSTM_model.predict(documents_val)
-predicted_ratings = [max(0, min(round(x),4)) for x in predictions.flatten()]
+predicted_ratings = [max(0, min(round(x), 4)) for x in predictions.flatten()]
 # Compute the confusion matrix
 cm = confusion_matrix(ratings_val, predicted_ratings)
 # Display the confusion matrix using seaborn for better visualization
@@ -174,7 +177,7 @@ plt.savefig(r"C:\Users\ptria\source\repos\FlaskApi\images\word2vec\val_cm.png")
 plt.show()
 
 predictions = LSTM_model.predict(documents_train)
-predicted_ratings = [max(0, min(round(x),4)) for x in predictions.flatten()]
+predicted_ratings = [max(0, min(round(x), 4)) for x in predictions.flatten()]
 
 cm = confusion_matrix(ratings_train, predicted_ratings)
 # Display the confusion matrix using seaborn for better visualization
@@ -187,7 +190,7 @@ plt.savefig(r"C:\Users\ptria\source\repos\FlaskApi\images\word2vec\train_cm.png"
 plt.show()
 
 predictions = LSTM_model.predict(documents_test)
-predicted_ratings = [max(0, min(round(x),4)) for x in predictions.flatten()]
+predicted_ratings = [max(0, min(round(x), 4)) for x in predictions.flatten()]
 # Compute the confusion matrix
 cm = confusion_matrix(ratings_test, predicted_ratings)
 # Display the confusion matrix using seaborn for better visualization

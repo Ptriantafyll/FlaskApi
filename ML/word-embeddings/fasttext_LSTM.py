@@ -73,7 +73,8 @@ ratings_train = np.array(ratings_train)
 ratings_val = np.array(ratings_val)
 ratings_test = np.array(ratings_test)
 
-class_weights = compute_class_weight('balanced', classes=np.unique(ratings_train), y=ratings_train)
+class_weights = compute_class_weight(
+    'balanced', classes=np.unique(ratings_train), y=ratings_train)
 class_weights_dict = dict(enumerate(class_weights))
 
 # Get the vocabulary size
@@ -108,8 +109,9 @@ output_layer = Dense(1, activation='linear')(lstm_layer)
 
 # Create lstm model
 LSTM_model = Model(inputs=input_layer, outputs=output_layer)
-optimizer = tf.keras.optimizers.Adam(learning_rate = 1e-4)
-LSTM_model.compile(optimizer=optimizer, loss='mean_squared_error', metrics=['mae'])
+optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)
+LSTM_model.compile(optimizer=optimizer,
+                   loss='mean_squared_error', metrics=['mae'])
 
 LSTM_model.summary()  # Print model
 # Train model
@@ -137,7 +139,7 @@ plt.show()
 
 
 predictions = LSTM_model.predict(documents_val)
-predicted_ratings = [max(0, min(round(x),4)) for x in predictions.flatten()]
+predicted_ratings = [max(0, min(round(x), 4)) for x in predictions.flatten()]
 # Compute the confusion matrix
 cm = confusion_matrix(ratings_val, predicted_ratings)
 # Display the confusion matrix using seaborn for better visualization
@@ -150,7 +152,7 @@ plt.savefig(r"C:\Users\ptria\source\repos\FlaskApi\images\fasttext\val_cm.png")
 plt.show()
 
 predictions = LSTM_model.predict(documents_train)
-predicted_ratings = [max(0, min(round(x),4)) for x in predictions.flatten()]
+predicted_ratings = [max(0, min(round(x), 4)) for x in predictions.flatten()]
 
 cm = confusion_matrix(ratings_train, predicted_ratings)
 # Display the confusion matrix using seaborn for better visualization
@@ -163,7 +165,7 @@ plt.savefig(r"C:\Users\ptria\source\repos\FlaskApi\images\fasttext\train_cm.png"
 plt.show()
 
 predictions = LSTM_model.predict(documents_test)
-predicted_ratings = [max(0, min(round(x),4)) for x in predictions.flatten()]
+predicted_ratings = [max(0, min(round(x), 4)) for x in predictions.flatten()]
 # Compute the confusion matrix
 cm = confusion_matrix(ratings_test, predicted_ratings)
 # Display the confusion matrix using seaborn for better visualization
